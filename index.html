@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FluentFlow — Learn a Language Daily</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f6f7fb; --card:#ffffff; --ink:#1c1f2e; --sub:#6b7080; --line:#e7e8ef;
+  --accent:#58cc02; --accent2:#1cb0f6; --accent-dark:#3d9c00; --gold:#ffc800;
+  --radius:18px; --shadow:0 8px 24px rgba(20,20,40,.08);
+  font-family:'Inter',system-ui,sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#12131c; --card:#1b1d2b; --ink:#f1f2f8; --sub:#9497ab; --line:#2a2c3d; } }
+:root[data-theme="dark"]{ --bg:#12131c; --card:#1b1d2b; --ink:#f1f2f8; --sub:#9497ab; --line:#2a2c3d; }
+:root[data-lang="neutral"]{ --accent:#6d5ce8; --accent2:#00b4a6; --accent-dark:#4b3bb0; --gold:#ffd166; }
+:root[data-lang="zh"]{ --accent:#de2910; --accent2:#c9a13b; --accent-dark:#a31f0c; --gold:#ffd200; }
+:root[data-lang="de"]{ --accent:#222222; --accent2:#dd0000; --accent-dark:#000000; --gold:#ffce00; }
+:root[data-lang="es"]{ --accent:#f1a208; --accent2:#c60b1e; --accent-dark:#c47f00; --gold:#ffcd00; }
+:root[data-lang="en"]{ --accent:#00247d; --accent2:#cf142b; --accent-dark:#001a5c; --gold:#f0f0f0; }
+:root[data-lang="fr"]{ --accent:#0055a4; --accent2:#ef4135; --accent-dark:#003b73; --gold:#8a8f9e; }
+
+*{box-sizing:border-box;}
+html,body{margin:0;color:var(--ink);height:100%;}
+body{
+  transition:background .5s;
+  background:
+    radial-gradient(circle at 12% -6%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 52%),
+    radial-gradient(circle at 100% 12%, color-mix(in srgb, var(--accent2) 16%, transparent), transparent 50%),
+    radial-gradient(circle at 6% 78%, color-mix(in srgb, var(--accent2) 12%, transparent), transparent 46%),
+    radial-gradient(circle at 96% 92%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 46%),
+    var(--bg);
+  background-attachment:fixed;
+}
+img,svg{max-width:100%;}
+.bgMotif{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.bgMotif span{position:absolute;opacity:.16;filter:saturate(1.15);animation:motifFloat 6.5s ease-in-out infinite;}
+@keyframes motifFloat{0%,100%{transform:translateY(0) rotate(var(--r,0deg));}50%{transform:translateY(-14px) rotate(calc(var(--r,0deg) + 6deg));}}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 90px;position:relative;z-index:1;}
+h1,h2,h3{font-family:'Baloo 2',sans-serif;margin:0 0 6px;}
+button{font-family:inherit;cursor:pointer;}
+.hide{display:none !important;}
+a{color:var(--accent2);}
+@keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.authScreen{max-width:420px;margin:0 auto;padding:36px 18px 40px;min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;animation:rise .35s ease both;}
+.logoRow{text-align:center;margin-bottom:22px;}
+.logoRow h1{font-size:30px;margin-top:8px;}
+.motto{color:var(--sub);font-size:14px;margin-top:-4px;}
+.authCard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--sub);margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em;}
+.field input{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;background:var(--bg);color:var(--ink);font-family:inherit;}
+.field input:focus{outline:none;border-color:var(--accent);}
+.pwHint{font-size:11px;color:var(--sub);margin-top:-9px;margin-bottom:12px;}
+.checkRow{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--sub);margin:14px 0 18px;}
+.checkRow input{margin-top:2px;}
+.btn{border:none;border-radius:12px;padding:13px 18px;font-weight:700;font-size:15px;width:100%;}
+.btn.primary{background:var(--accent);color:#fff;}
+.btn.google{background:var(--card);border:1.5px solid var(--line);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink);}
+.btn:disabled{opacity:.45;}
+.divider{display:flex;align-items:center;gap:10px;color:var(--sub);font-size:12px;margin:16px 0;}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line);}
+.switchLine{text-align:center;font-size:13px;color:var(--sub);margin-top:16px;}
+.switchLine b{color:var(--accent2);cursor:pointer;}
+.errText{color:#e5484d;font-size:12px;margin-top:-8px;margin-bottom:10px;font-weight:600;}
+.modalOverlay{position:fixed;inset:0;background:rgba(10,10,20,.5);display:flex;align-items:center;justify-content:center;z-index:60;padding:20px;}
+.modalCard{background:var(--card);border-radius:18px;padding:22px;max-width:380px;width:100%;box-shadow:var(--shadow);animation:rise .2s ease both;}
+.gAccount{display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:10px;cursor:pointer;}
+.gAccount:hover{background:var(--bg);}
+.gAvatar{width:36px;height:36px;border-radius:50%;background:#4285F4;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;}
+.welcomeScreen{text-align:center;}
+@keyframes popIn{from{opacity:0;transform:scale(.4) rotate(-8deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+@keyframes floatBounce{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-12px) rotate(1deg);}}
+.backBtn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--sub);font-weight:700;font-size:13px;margin-bottom:16px;padding:4px 0;}
+.backBtn:hover{color:var(--ink);}
+.stepDots{display:flex;justify-content:center;gap:6px;margin-bottom:18px;}
+.stepDots span{width:7px;height:7px;border-radius:50%;background:var(--line);}
+.stepDots span.on{background:var(--accent);width:20px;border-radius:4px;}
+
+.grid5{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;}
+.langCard{cursor:pointer;border-radius:16px;padding:18px 10px;text-align:center;background:var(--card);border:2px solid var(--line);transition:.15s;flex:0 1 140px;}
+.langCard:hover{transform:translateY(-3px);}
+.langCard:active{transform:scale(.96);}
+.langCard.sel{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 10%, var(--card));}
+.langCard .flag{font-size:38px;}
+.langCard .name{font-weight:700;margin-top:8px;font-size:14px;}
+.langCard .speakers{font-size:11px;color:var(--sub);margin-top:2px;}
+
+.levelGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 18px;}
+.levelCard{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:13px;border-radius:14px;border:2px solid var(--line);background:var(--card);text-align:left;}
+.levelCard .lic{font-size:22px;flex:none;}
+.levelCard b{display:block;font-size:14px;}
+.levelCard p{margin:0;font-size:11px;color:var(--sub);line-height:1.3;}
+.levelCard.sel{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 10%, var(--card));}
+.levelCard{transition:transform .15s ease;}
+.levelCard:active{transform:scale(.96);}
+@media (max-width:340px){.levelGrid{grid-template-columns:1fr;}}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 4px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:6;}
+.brand{display:flex;align-items:center;gap:8px;font-family:'Baloo 2';font-weight:800;font-size:20px;}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);}
+.stat{display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-weight:700;font-size:13px;box-shadow:var(--shadow);}
+.avatarWrap{position:relative;}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;}
+.avatarMenu{position:absolute;right:0;top:42px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px;width:180px;z-index:20;animation:rise .15s ease both;}
+.avatarMenu .amName{font-weight:700;font-size:13px;padding:8px 10px 4px;color:var(--sub);}
+.avatarMenu button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:none;padding:9px 10px;border-radius:9px;font-weight:600;font-size:13.5px;color:var(--ink);}
+.avatarMenu button:hover{background:var(--bg);}
+
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px;border:1px solid var(--line);}
+.mascotRow{display:flex;align-items:center;gap:12px;}
+.bubble{background:var(--card);border:1px solid var(--line);border-radius:16px;border-bottom-left-radius:2px;padding:10px 14px;font-size:14px;font-weight:600;box-shadow:var(--shadow);flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.spk{background:none;border:none;font-size:16px;flex:none;}
+.heroBar{position:relative;overflow:hidden;border-radius:18px;padding:18px;margin-bottom:16px;color:#fff;background:linear-gradient(120deg,var(--accent),var(--accent2));display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);}
+.heroBar::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.22) 48%,transparent 62%);animation:shimmer 4s ease-in-out infinite;pointer-events:none;}
+@keyframes shimmer{0%{transform:translateX(-70%);}100%{transform:translateX(70%);}}
+.heroBar .hIcons{font-size:26px;letter-spacing:2px;position:relative;}
+.heroBar .hFact{font-size:12.5px;opacity:.95;font-weight:600;line-height:1.4;position:relative;}
+
+.progStrip{display:flex;gap:10px;margin-bottom:16px;}
+.psChip{flex:1;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 8px;text-align:center;box-shadow:var(--shadow);}
+.psChip .psIc{font-size:20px;display:block;margin-bottom:2px;}
+.psChip b{display:block;font-size:17px;font-family:'Baloo 2',sans-serif;}
+.psChip span{display:block;font-size:10.5px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+
+.path{position:relative;display:flex;flex-direction:column;gap:12px;margin-top:14px;}
+.node{position:relative;display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;border-radius:18px;border:1.5px solid var(--line);background:var(--bg);overflow:hidden;}
+.node:not(.locked):active{transform:scale(.97);}
+.node.done{background:linear-gradient(120deg, color-mix(in srgb, var(--accent) 18%, var(--card)), color-mix(in srgb, var(--accent) 4%, var(--card)));border-color:color-mix(in srgb, var(--accent) 40%, var(--line));}
+.node.active{background:linear-gradient(120deg, color-mix(in srgb, var(--accent2) 22%, var(--card)), color-mix(in srgb, var(--accent2) 5%, var(--card)));border-color:color-mix(in srgb, var(--accent2) 50%, var(--line));box-shadow:var(--shadow);}
+.node.locked{opacity:.65;}
+.node .circ{width:56px;height:56px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;background:var(--line);z-index:1;box-shadow:0 4px 0 rgba(0,0,0,.08);}
+.node.done .circ{background:var(--accent);}
+.node.active .circ{background:var(--accent2);animation:pulse 1.8s infinite;}
+.node.locked .circ{background:var(--line);color:var(--sub);}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--accent2) 45%, transparent);}50%{box-shadow:0 0 0 8px transparent;}}
+.node .txt{flex:1;min-width:0;}
+.node .txt b{display:block;font-size:15.5px;}
+.node .txt span{font-size:12px;color:var(--sub);}
+.node.locked .txt{color:var(--sub);}
+.nodeArrow{flex:none;font-size:16px;color:var(--accent2);}
+
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 0 14px;}
+.tab{flex:none;padding:8px 16px;border-radius:20px;border:1px solid var(--line);background:var(--card);font-weight:700;color:var(--sub);font-size:14px;}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+.lessonPanel{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:20px;padding:30px 20px;text-align:center;}
+.lessonPanel .licon{font-size:28px;margin-bottom:8px;}
+.lessonPanel .ltr{font-size:24px;font-weight:800;font-family:'Baloo 2';line-height:1.35;}
+.lessonPanel .lpron{opacity:.9;font-size:13px;margin-top:4px;}
+.lessonPanel .len{opacity:.85;font-size:13px;margin-top:12px;font-style:italic;}
+.audioBtn{margin-top:14px;background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.5);color:#fff;border-radius:20px;padding:8px 18px;font-weight:700;font-size:13px;}
+.rowBtns{display:flex;gap:10px;margin-top:14px;}
+.btn.secondary{background:var(--accent2);color:#fff;}
+.qOptions{display:grid;gap:10px;margin-top:14px;}
+.qOpt{padding:14px;border-radius:12px;border:2px solid var(--line);background:var(--card);font-weight:600;text-align:left;font-size:14.5px;width:100%;}
+.qOpt.correct{border-color:#16a34a;background:rgba(22,163,74,.16);color:#15803d;}
+.qOpt.wrong{border-color:#e5484d;background:rgba(229,72,77,.16);color:#c11c22;}
+.qHead{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.matchGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;}
+.matchTile{aspect-ratio:1.3;border-radius:12px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;text-align:center;padding:6px;cursor:pointer;}
+.matchTile.done{opacity:0;pointer-events:none;}
+.matchTile.picked{outline:3px solid var(--gold);}
+.xpbar{height:10px;border-radius:6px;background:var(--line);overflow:hidden;}
+.xpbar>i{display:block;height:100%;background:var(--accent);transition:width .4s;}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px;}
+.cal div{aspect-ratio:1;border-radius:6px;background:var(--line);}
+.cal div.on{background:var(--accent);}
+.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;}
+.kv b{color:var(--sub);font-weight:600;font-size:12px;text-transform:uppercase;}
+footer.tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px));z-index:10;}
+footer.tabbar button{background:none;border:none;color:var(--sub);font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;}
+footer.tabbar button.active{color:var(--accent);}
+footer.tabbar button span.ic{font-size:20px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:20px;font-weight:600;font-size:14px;z-index:30;opacity:0;transition:.3s;pointer-events:none;max-width:88%;text-align:center;}
+.toast.show{opacity:1;transform:translate(-50%,-6px);}
+canvas{max-width:100%;}
+.mascotResult{margin:10px auto;width:90px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both, floatBounce 2.4s ease-in-out .5s infinite;}
+
+/* ---- splash redesign ---- */
+.splashScreen{max-width:480px;}
+.splashHero{position:relative;text-align:center;background:linear-gradient(150deg,color-mix(in srgb, var(--accent) 16%, var(--bg)),color-mix(in srgb, var(--accent2) 14%, var(--bg)));border-radius:26px;padding:34px 20px 26px;margin-bottom:18px;overflow:hidden;z-index:0;}
+.heroGlow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:220px;height:220px;background:radial-gradient(circle,color-mix(in srgb, var(--accent) 35%, transparent),transparent 70%);pointer-events:none;}
+.splashHero h1{position:relative;font-size:30px;margin-top:10px;}
+.splashHero .motto{position:relative;}
+.featChips{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px;}
+.featChips .chip{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12px;font-weight:700;box-shadow:var(--shadow);}
+
+/* ---- registration compact grid ---- */
+.fieldGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fieldGrid .field{margin-bottom:10px;}
+@media (max-width:380px){.fieldGrid{grid-template-columns:1fr;}}
+
+/* ---- section header (replaces duplicate top tabs) ---- */
+.sectionHead{margin:2px 2px 14px;}
+.sectionHead h2{font-size:19px;}
+.sectionHead p{margin:2px 0 0;font-size:13px;color:var(--sub);}
+
+/* ---- welcome screen staged animation ---- */
+.mascotStage{position:relative;display:flex;justify-content:center;margin-bottom:4px;}
+.mascotBig{opacity:0;transform:scale(.3) rotate(-12deg);cursor:pointer;}
+.mascotBig.pop{animation:popIn .7s cubic-bezier(.34,1.56,.64,1) forwards, floatBounce 2.6s ease-in-out .7s infinite;}
+.mascotEyes{transform-box:fill-box;transform-origin:center;animation:blink 4.2s ease-in-out infinite;}
+@keyframes blink{0%,88%,100%{transform:scaleY(1);}92%,96%{transform:scaleY(.12);}}
+@keyframes boop{0%{transform:scale(1) rotate(0);}30%{transform:scale(1.16,.86) rotate(-7deg);}55%{transform:scale(.9,1.12) rotate(5deg);}80%{transform:scale(1.05,.97) rotate(-2deg);}100%{transform:scale(1) rotate(0);}}
+.sparkles{position:absolute;inset:0;pointer-events:none;}
+.sparkles span{position:absolute;top:50%;left:50%;font-size:20px;opacity:0;}
+.sparkles.burst span{animation:sparkleOut 1.1s ease-out forwards;}
+@keyframes sparkleOut{0%{opacity:0;transform:translate(-50%,-50%) scale(.3);}25%{opacity:1;}100%{opacity:0;transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) scale(1);}}
+.welcomeText{opacity:0;transform:translateY(10px);transition:opacity .6s ease, transform .6s ease;}
+.welcomeText.show{opacity:1;transform:translateY(0);}
+
+/* ---- ring chart ---- */
+.ringWrap{display:flex;justify-content:center;}
+
+/* ---- chat-style lesson reveal ---- */
+.chatThread{display:flex;flex-direction:column;gap:12px;max-height:360px;overflow-y:auto;padding:6px 4px 4px;margin-top:10px;scroll-behavior:smooth;}
+.chatMsg{display:flex;gap:9px;align-items:flex-start;animation:rise .35s ease both;}
+.chatAvatar{flex:none;width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.chatBubble{flex:1;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:16px;border-top-left-radius:4px;padding:12px 14px;cursor:pointer;transition:transform .18s ease, box-shadow .18s ease;box-shadow:0 3px 10px rgba(20,20,40,.10);}
+.chatBubble:active{transform:scale(.98);}
+.chatFront b{display:block;font-size:16px;font-family:'Baloo 2',sans-serif;line-height:1.3;}
+.chatPron{display:block;font-size:12px;opacity:.88;margin-top:3px;font-style:italic;}
+.tapHint{display:block;font-size:10px;opacity:.85;margin-top:7px;letter-spacing:.02em;}
+.chatBubble.flipped{background:var(--card);color:var(--ink);border:1.5px solid var(--accent);}
+.chatBubble.flipped .tapHint{color:var(--sub);opacity:1;}
+.chatBack{display:none;}
+.chatBubble.flipped .chatFront{display:none;}
+.chatBubble.flipped .chatBack{display:block;}
+.chatBackLabel{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);font-weight:700;margin-bottom:2px;}
+.chatBack b{display:block;font-size:14.5px;font-style:italic;color:var(--ink);}
+
+/* ---- quiz analysis ---- */
+.analysisList{display:flex;flex-direction:column;gap:8px;margin:14px 0;text-align:left;}
+.aRow{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);}
+.aRow.bad{border-color:color-mix(in srgb, #e5484d 45%, var(--line));}
+.aRow.ok{border-color:color-mix(in srgb, #16a34a 45%, var(--line));}
+.aIc{font-size:15px;flex:none;margin-top:1px;}
+.aBody b{display:block;font-size:13.5px;}
+.aBody span{font-size:12px;color:var(--sub);}
+
+/* ---- per-module game badge ---- */
+.gameTag{display:inline-block;margin-top:3px;font-size:10px;font-weight:700;color:var(--accent2);background:color-mix(in srgb, var(--accent2) 14%, var(--card));padding:2px 8px;border-radius:10px;letter-spacing:.02em;}
+
+/* ---- sentence builder game ---- */
+.builtRow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-height:46px;margin-top:14px;padding:10px;border:1.5px dashed var(--line);border-radius:12px;transition:.2s;}
+.builtRow.ok{border-color:#16a34a;border-style:solid;background:rgba(22,163,74,.08);}
+.builtRow.bad{border-color:#e5484d;border-style:solid;background:rgba(229,72,77,.08);}
+.chipPlaceholder{color:var(--sub);font-size:12.5px;}
+.bankRow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.chip{border-radius:10px;padding:9px 13px;font-weight:700;font-size:14.5px;border:none;font-family:'Baloo 2',sans-serif;}
+.chip.bank{background:var(--card);border:2px solid var(--line);color:var(--ink);}
+.chip.bank:active{transform:scale(.94);}
+.chip.built{background:var(--accent);color:#fff;}
+.chip.built:active{transform:scale(.94);}
+.chip:disabled{opacity:.7;}
+
+/* ---- listening challenge ---- */
+.listenPlayBtn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:22px;padding:16px 26px;font-weight:800;font-size:15px;box-shadow:var(--shadow);}
+.listenPlayBtn:active{transform:scale(.96);}
+
+/* ---- speed match timer ---- */
+.smHead{display:flex;gap:8px;margin:10px 0 4px;}
+.smHead .stat{margin:0;}
+.smHead .stat.warn{color:#c11c22;border-color:#e5484d;}
+
+/* ---- mascot parts + reactions ---- */
+.mascot{transition:transform .25s ease;overflow:visible;}
+.mPupils{transition:transform .12s ease-out;}
+.mWingL,.mWingR{transform-box:fill-box;transform-origin:50% 8%;}
+.mascotBig.waving .mWingR{animation:wingUpR .45s ease-in-out infinite alternate;}
+.mascotBig.waving .mWingL{animation:wingUpL .45s ease-in-out .2s infinite alternate;}
+@keyframes wingUpR{from{transform:rotate(0);}to{transform:rotate(-55deg);}}
+@keyframes wingUpL{from{transform:rotate(0);}to{transform:rotate(55deg);}}
+.mReact{display:inline-block;transform-origin:50% 90%;}
+.mReact.act-jump{animation:actJump .8s cubic-bezier(.3,1.4,.5,1);}
+.mReact.act-spin{animation:actSpin .8s ease-in-out;}
+.mReact.act-wiggle{animation:actWiggle .7s ease-in-out;}
+.mReact.act-flip{animation:actFlip .9s ease-in-out;}
+.mReact.act-dizzy{animation:actDizzy 1.1s ease-in-out;}
+@keyframes actJump{0%{transform:scale(1,1);}20%{transform:scale(1.15,.8);}50%{transform:translateY(-70px) scale(.92,1.1);}80%{transform:translateY(0) scale(1.12,.86);}100%{transform:scale(1,1);}}
+@keyframes actSpin{to{transform:rotate(360deg) scale(1);}}
+@keyframes actWiggle{0%,100%{transform:rotate(0);}15%{transform:rotate(-14deg);}35%{transform:rotate(12deg);}55%{transform:rotate(-9deg);}75%{transform:rotate(6deg);}}
+@keyframes actFlip{0%{transform:rotateY(0) translateY(0);}50%{transform:rotateY(180deg) translateY(-30px);}100%{transform:rotateY(360deg) translateY(0);}}
+@keyframes actDizzy{0%{transform:rotate(0) scale(1);}60%{transform:rotate(720deg) scale(1.15);}80%{transform:rotate(700deg) scale(.95);}100%{transform:rotate(720deg) scale(1);}}
+.mascotStage{margin-top:54px;}
+.wBubble{position:absolute;left:50%;top:-6px;transform:translate(-50%,-100%) scale(.85);background:var(--card);border:1.5px solid var(--accent);color:var(--ink);padding:8px 14px;border-radius:16px;font-weight:700;font-size:13.5px;white-space:nowrap;box-shadow:var(--shadow);opacity:0;transition:.25s;pointer-events:none;z-index:2;}
+.wBubble::after{content:'';position:absolute;left:50%;bottom:-7px;width:12px;height:12px;background:var(--card);border-right:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);transform:translateX(-50%) rotate(45deg);}
+.wBubble.show{opacity:1;transform:translate(-50%,-100%) scale(1);}
+.fxPart{position:absolute;left:50%;top:50%;font-size:20px;pointer-events:none;animation:fxOut 1s ease-out forwards;z-index:3;}
+@keyframes fxOut{0%{opacity:1;transform:translate(-50%,-50%) scale(.4);}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.2);}}
+
+/* ---- scenic full-page home ---- */
+.sceneFx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;display:none;}
+body.homeMode .sceneFx{display:block;}
+body.homeMode{background:
+  radial-gradient(circle at 85% 8%, color-mix(in srgb,var(--gold) 70%,transparent) 0 4.5%, transparent 5%),
+  linear-gradient(180deg, color-mix(in srgb,var(--accent2) 42%,var(--bg)) 0%, color-mix(in srgb,var(--accent2) 18%,var(--bg)) 38%, color-mix(in srgb,var(--accent) 30%,var(--bg)) 78%, color-mix(in srgb,var(--accent) 52%,var(--bg)) 100%);
+  background-attachment:fixed;}
+body.homeMode .bgMotif span{opacity:.34;}
+body.homeMode .topbar{background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:0 0 16px 16px;}
+.cloud{position:absolute;font-size:64px;opacity:.75;animation:cloudDrift linear infinite;}
+.cloud.c1{top:12%;font-size:70px;animation-duration:60s;}
+.cloud.c2{top:34%;font-size:48px;animation-duration:85s;animation-delay:-30s;}
+.cloud.c3{top:58%;font-size:58px;animation-duration:70s;animation-delay:-50s;}
+@keyframes cloudDrift{from{transform:translateX(-120px);}to{transform:translateX(calc(100vw + 120px));}}
+.hill{position:absolute;left:-10%;width:120%;border-radius:50% 50% 0 0;}
+.hill.h1{bottom:-90px;height:190px;background:color-mix(in srgb,var(--accent) 38%,transparent);}
+.hill.h2{bottom:-120px;left:-40%;width:110%;height:200px;background:color-mix(in srgb,var(--accent2) 30%,transparent);}
+.lvlStrip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 14px;box-shadow:var(--shadow);margin-bottom:8px;}
+.lvlStrip b{font-size:13.5px;}
+.lvlStrip .xpbar{flex:1;min-width:90px;}
+.lvlStrip span{font-size:12px;font-weight:700;color:var(--sub);}
+.mapScene{position:relative;width:100%;margin-bottom:24px;}
+.mapPath{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+.mapPath path{fill:none;stroke-linecap:round;vector-effect:non-scaling-stroke;}
+.mapPath .pBase{stroke:color-mix(in srgb,var(--card) 85%,transparent);stroke-width:9;stroke-dasharray:1 16;}
+.mapPath .pDone{stroke:var(--accent);stroke-width:9;}
+.mapNode{position:absolute;transform:translate(-50%,-50%);width:0;height:0;cursor:pointer;}
+.mapCirc{position:absolute;left:-40px;top:-40px;width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#fff;background:var(--line);border:5px solid var(--card);box-shadow:0 8px 0 rgba(0,0,0,.10),0 12px 24px rgba(20,20,40,.18);transition:transform .15s ease;}
+.mapNode:not(.locked):hover .mapCirc{transform:translateY(-4px) scale(1.05);}
+.mapNode:not(.locked):active .mapCirc{transform:scale(.94);}
+.mapNode.done .mapCirc{background:var(--accent);}
+.mapNode.active .mapCirc{background:var(--accent2);animation:pulse 1.8s infinite;}
+.mapNode.locked .mapCirc{background:color-mix(in srgb,var(--card) 70%,var(--line));color:var(--sub);filter:saturate(.35);}
+.mapNode.goal .mapCirc{font-size:38px;}
+.mapNode.goal.done .mapCirc{background:var(--gold);}
+.lockBadge,.starBadge{position:absolute;right:-8px;top:-6px;font-size:18px;filter:none;}
+.mapLabel{position:absolute;left:50%;top:50px;transform:translateX(-50%);min-width:130px;max-width:190px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 12px;box-shadow:var(--shadow);}
+.mapLabel b{display:block;font-size:13.5px;line-height:1.25;}
+.mapLabel span{font-size:11px;color:var(--sub);font-weight:600;}
+.mapNode.locked .mapLabel{opacity:.85;}
+.mapMascot{position:absolute;left:-31px;bottom:44px;width:62px;display:flex;flex-direction:column;align-items:center;animation:floatBounce 2.2s ease-in-out infinite;pointer-events:none;}
+.startTag{background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:2px 9px;border-radius:10px;letter-spacing:.06em;margin-top:-2px;box-shadow:0 3px 0 var(--accent-dark);}
+.pron{display:block;font-weight:600;font-size:12px;font-style:italic;opacity:.75;margin-top:2px;letter-spacing:.01em;}
+.matchTile .pron{font-size:10px;}
+.qOpt.correct .pron{color:#15803d;opacity:.9;}.qOpt.wrong .pron{color:#c11c22;opacity:.9;}
+.sayBtn{flex:none;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);font-size:15px;line-height:1;padding:0;color:var(--ink);transition:transform .12s ease,background .2s;}
+.sayBtn:hover{background:color-mix(in srgb,var(--accent2) 14%,var(--card));}
+.sayBtn:active{transform:scale(.9);}
+.sayBtn.playing{background:var(--accent2);border-color:var(--accent2);animation:pulse 0.9s;}
+.sayBtn.onDark{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.55);}
+.sayBtn.big{width:44px;height:44px;font-size:18px;vertical-align:middle;margin-left:6px;}
+.hdrAudio{display:flex;gap:6px;flex:none;}
+.optRow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;}
+.bubbleTop{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.tileSpk{position:absolute;right:4px;top:4px;width:24px;height:24px;font-size:11px;}
+.matchTile{position:relative;}
+</style>
+</head>
+<body>
+<div class="bgMotif" id="bgMotif"></div>
+<div class="sceneFx" id="sceneFx"><span class="cloud c1">☁️</span><span class="cloud c2">☁️</span><span class="cloud c3">☁️</span><div class="hill h2"></div><div class="hill h1"></div></div>
+<div id="app"></div>
+<footer class="tabbar hide" id="tabbar"></footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const LANGS = {
+  zh:{name:"Mandarin Chinese",flag:"🇨🇳",speakers:"1.14B speakers"},
+  de:{name:"German",flag:"🇩🇪",speakers:"135M speakers"},
+  es:{name:"Spanish",flag:"🇪🇸",speakers:"560M speakers"},
+  en:{name:"English",flag:"🇬🇧",speakers:"1.5B speakers"},
+  fr:{name:"French",flag:"🇫🇷",speakers:"280M speakers"},
+};
+const LANG_CODES = {zh:'zh-CN', de:'de-DE', es:'es-ES', en:'en-US', fr:'fr-FR'};
+const CULTURE = {
+  neutral:{icons:["🌍","🗣️","📚","✏️","🇫🇷","🇩🇪","🇪🇸","🇨🇳"], fact:"Learning a new language rewires how you think, not just how you talk."},
+  zh:{icons:["🏮","⛩️","🐉","🥟"], fact:"The Great Wall of China stretches over 21,000 km across the country."},
+  de:{icons:["🏰","🥨","🚂","🌲"], fact:"Germany is home to over 25,000 castles and palaces."},
+  es:{icons:["💃","🎸","🌞","🏛️"], fact:"Spanish is the official language of 20 countries across two continents."},
+  en:{icons:["🎡","☂️","🚌","👑"], fact:"English is an official or primary language in more than 50 countries worldwide."},
+  fr:{icons:["🗼","🥖","🎨","🍷"], fact:"French is spoken on every inhabited continent in the world."},
+};
+const LEVEL_DATA = {
+  Beginner:{ icon:"🌱", desc:"New to the language? Start with real phrases for real situations.",
+    modules:[
+      {title:"Breaking the Ice", icon:"👋", items:[
+        {en:"Nice to meet you!", zh:["很高兴认识你！","hěn gāoxìng rènshi nǐ"], de:"Freut mich, dich kennenzulernen!", es:"¡Mucho gusto en conocerte!", hi:["आपसे मिलकर खुशी हुई!","aapse milkar khushi hui"], fr:"Ravi de te rencontrer !"},
+        {en:"Where are you from?", zh:["你来自哪里？","nǐ láizì nǎlǐ"], de:"Woher kommst du?", es:"¿De dónde eres?", hi:["आप कहाँ से हैं?","aap kahaan se hain"], fr:"D'où viens-tu ?"},
+        {en:"I'm learning your language.", zh:["我在学习你的语言。","wǒ zài xuéxí nǐ de yǔyán"], de:"Ich lerne deine Sprache.", es:"Estoy aprendiendo tu idioma.", hi:["मैं आपकी भाषा सीख रहा हूँ।","main aapki bhasha seekh raha hoon"], fr:"J'apprends ta langue."}]},
+      {title:"Getting Around Town", icon:"🧭", items:[
+        {en:"Where is the nearest station?", zh:["最近的车站在哪里？","zuìjìn de chēzhàn zài nǎlǐ"], de:"Wo ist der nächste Bahnhof?", es:"¿Dónde está la estación más cercana?", hi:["सबसे नज़दीकी स्टेशन कहाँ है?","sabse nazdeeki station kahaan hai"], fr:"Où est la gare la plus proche ?"},
+        {en:"How much does this cost?", zh:["这个多少钱？","zhège duōshǎo qián"], de:"Wie viel kostet das?", es:"¿Cuánto cuesta esto?", hi:["इसकी कीमत कितनी है?","iski keemat kitni hai"], fr:"Combien ça coûte ?"},
+        {en:"Can you help me, please?", zh:["你能帮帮我吗？","nǐ néng bāngbāng wǒ ma"], de:"Können Sie mir bitte helfen?", es:"¿Puede ayudarme, por favor?", hi:["क्या आप मेरी मदद कर सकते हैं?","kya aap meri madad kar sakte hain"], fr:"Pouvez-vous m'aider, s'il vous plaît ?"}]},
+      {title:"Café Culture", icon:"☕", items:[
+        {en:"I would like a coffee, please.", zh:["我想要一杯咖啡。","wǒ xiǎng yào yī bēi kāfēi"], de:"Ich hätte gern einen Kaffee, bitte.", es:"Quisiera un café, por favor.", hi:["मुझे एक कॉफी चाहिए, कृपया।","mujhe ek coffee chahiye, kripaya"], fr:"Je voudrais un café, s'il vous plaît."},
+        {en:"The bill, please.", zh:["请给我账单。","qǐng gěi wǒ zhàngdān"], de:"Die Rechnung, bitte.", es:"La cuenta, por favor.", hi:["बिल दीजिए, कृपया।","bill dijiye, kripaya"], fr:"L'addition, s'il vous plaît."},
+        {en:"Is this seat taken?", zh:["这个位置有人吗？","zhège wèizhì yǒurén ma"], de:"Ist dieser Platz besetzt?", es:"¿Está ocupado este asiento?", hi:["क्या यह सीट खाली है?","kya yeh seat khaali hai"], fr:"Cette place est-elle occupée ?"}]},
+      {title:"Family & Friends", icon:"👨‍👩‍👧", items:[
+        {en:"This is my family.", zh:["这是我的家人。","zhè shì wǒ de jiārén"], de:"Das ist meine Familie.", es:"Esta es mi familia.", hi:["यह मेरा परिवार है।","yeh mera parivaar hai"], fr:"Voici ma famille."},
+        {en:"I have two siblings.", zh:["我有两个兄弟姐妹。","wǒ yǒu liǎng gè xiōngdì jiěmèi"], de:"Ich habe zwei Geschwister.", es:"Tengo dos hermanos.", hi:["मेरे दो भाई-बहन हैं।","mere do bhai-bahen hain"], fr:"J'ai deux frères et sœurs."}]},
+      {title:"Numbers & Time", icon:"🔢", items:[
+        {en:"What time is it?", zh:["现在几点了？","xiànzài jǐ diǎn le"], de:"Wie spät ist es?", es:"¿Qué hora es?", hi:["अभी क्या समय हुआ है?","abhi kya samay hua hai"], fr:"Quelle heure est-il ?"},
+        {en:"I'll be there in ten minutes.", zh:["我十分钟后到。","wǒ shí fēnzhōng hòu dào"], de:"Ich bin in zehn Minuten da.", es:"Llegaré en diez minutos.", hi:["मैं दस मिनट में पहुँच जाऊँगा।","main das minute mein pahunch jaunga"], fr:"J'y serai dans dix minutes."}]}
+    ]},
+  Basic:{ icon:"🧩", desc:"Comfortable with basics? Build everyday fluency across common situations.",
+    modules:[
+      {title:"Daily Routines", icon:"⏰", items:[
+        {en:"I usually wake up early.", zh:["我通常很早起床。","wǒ tōngcháng hěn zǎo qǐchuáng"], de:"Ich stehe normalerweise früh auf.", es:"Normalmente me levanto temprano.", hi:["मैं आमतौर पर जल्दी उठता हूँ।","main aamtaur par jaldi uthta hoon"], fr:"Je me lève généralement tôt."},
+        {en:"What time do you finish work?", zh:["你几点下班？","nǐ jǐ diǎn xiàbān"], de:"Wann hast du Feierabend?", es:"¿A qué hora terminas de trabajar?", hi:["आप काम कब ख़त्म करते हैं?","aap kaam kab khatam karte hain"], fr:"À quelle heure finis-tu le travail ?"},
+        {en:"Let's meet tomorrow.", zh:["我们明天见面吧。","wǒmen míngtiān jiànmiàn ba"], de:"Lass uns morgen treffen.", es:"Quedemos mañana.", hi:["चलो कल मिलते हैं।","chalo kal milte hain"], fr:"Retrouvons-nous demain."}]},
+      {title:"Marketplace Bargaining", icon:"🛍️", items:[
+        {en:"Can you lower the price?", zh:["你能便宜一点吗？","nǐ néng piányi yīdiǎn ma"], de:"Können Sie den Preis senken?", es:"¿Puede bajar el precio?", hi:["क्या आप कीमत कम कर सकते हैं?","kya aap keemat kam kar sakte hain"], fr:"Pouvez-vous baisser le prix ?"},
+        {en:"This is too expensive.", zh:["这太贵了。","zhè tài guì le"], de:"Das ist zu teuer.", es:"Esto es demasiado caro.", hi:["यह बहुत महंगा है।","yeh bahut mehnga hai"], fr:"C'est trop cher."},
+        {en:"Do you have a discount?", zh:["有折扣吗？","yǒu zhékòu ma"], de:"Gibt es einen Rabatt?", es:"¿Tiene algún descuento?", hi:["क्या कोई छूट है?","kya koi chhoot hai"], fr:"Y a-t-il une réduction ?"}]},
+      {title:"Weather & Small Talk", icon:"☀️", items:[
+        {en:"It looks like it will rain today.", zh:["今天看起来会下雨。","jīntiān kànqǐlái huì xiàyǔ"], de:"Es sieht so aus, als würde es heute regnen.", es:"Parece que hoy va a llover.", hi:["लगता है आज बारिश होगी।","lagta hai aaj baarish hogi"], fr:"On dirait qu'il va pleuvoir aujourd'hui."},
+        {en:"The weather is lovely today.", zh:["今天天气很好。","jīntiān tiānqì hěn hǎo"], de:"Das Wetter ist heute wunderschön.", es:"El clima está precioso hoy.", hi:["आज मौसम बहुत सुहाना है।","aaj mausam bahut suhaana hai"], fr:"Il fait un temps magnifique aujourd'hui."},
+        {en:"How has your day been?", zh:["你今天过得怎么样？","nǐ jīntiān guò de zěnmeyàng"], de:"Wie war dein Tag?", es:"¿Cómo ha estado tu día?", hi:["आपका दिन कैसा रहा?","aapka din kaisa raha"], fr:"Comment s'est passée ta journée ?"}]},
+      {title:"At the Restaurant", icon:"🍽️", items:[
+        {en:"Can I see the menu, please?", zh:["请给我看一下菜单。","qǐng gěi wǒ kàn yīxià càidān"], de:"Kann ich bitte die Speisekarte sehen?", es:"¿Puedo ver el menú, por favor?", hi:["क्या मैं मेनू देख सकता हूँ?","kya main menu dekh sakta hoon"], fr:"Puis-je voir le menu, s'il vous plaît ?"},
+        {en:"I'm allergic to peanuts.", zh:["我对花生过敏。","wǒ duì huāshēng guòmǐn"], de:"Ich bin allergisch gegen Erdnüsse.", es:"Soy alérgico a los cacahuetes.", hi:["मुझे मूंगफली से एलर्जी है।","mujhe moongphali se allergy hai"], fr:"Je suis allergique aux cacahuètes."}]},
+      {title:"Directions", icon:"🗺️", items:[
+        {en:"Turn left at the next corner.", zh:["在下一个路口左转。","zài xià yīgè lùkǒu zuǒ zhuǎn"], de:"Biegen Sie an der nächsten Ecke links ab.", es:"Gire a la izquierda en la próxima esquina.", hi:["अगले मोड़ पर बाएँ मुड़ें।","agle mod par baayen muden"], fr:"Tournez à gauche au prochain coin."},
+        {en:"Is it far from here?", zh:["离这里远吗？","lí zhèlǐ yuǎn ma"], de:"Ist es weit von hier?", es:"¿Está lejos de aquí?", hi:["क्या यह यहाँ से दूर है?","kya yeh yahaan se door hai"], fr:"Est-ce loin d'ici ?"}]}
+    ]},
+  Intermediate:{ icon:"💬", desc:"Can hold basic conversations? Sharpen opinions, plans, and real talk.",
+    modules:[
+      {title:"Sharing Opinions", icon:"💭", items:[
+        {en:"In my opinion, this is a great idea.", zh:["在我看来，这是个好主意。","zài wǒ kànlái, zhè shì gè hǎo zhǔyì"], de:"Meiner Meinung nach ist das eine großartige Idee.", es:"En mi opinión, esta es una gran idea.", hi:["मेरी राय में, यह एक बेहतरीन विचार है।","meri raay mein, yeh ek behtareen vichaar hai"], fr:"À mon avis, c'est une excellente idée."},
+        {en:"I completely agree with you.", zh:["我完全同意你的看法。","wǒ wánquán tóngyì nǐ de kànfǎ"], de:"Ich stimme dir völlig zu.", es:"Estoy totalmente de acuerdo contigo.", hi:["मैं आपसे पूरी तरह सहमत हूँ।","main aapse poori tarah sahmat hoon"], fr:"Je suis entièrement d'accord avec toi."},
+        {en:"I see it a bit differently.", zh:["我的看法有点不同。","wǒ de kànfǎ yǒudiǎn bùtóng"], de:"Ich sehe das etwas anders.", es:"Yo lo veo un poco diferente.", hi:["मैं इसे थोड़ा अलग तरीके से देखता हूँ।","main ise thoda alag tarike se dekhta hoon"], fr:"Je vois les choses un peu différemment."}]},
+      {title:"Making Plans", icon:"📅", items:[
+        {en:"Shall we reschedule the meeting?", zh:["我们要重新安排会议时间吗？","wǒmen yào chóngxīn ānpái huìyì shíjiān ma"], de:"Sollen wir das Meeting verschieben?", es:"¿Deberíamos reprogramar la reunión?", hi:["क्या हमें मीटिंग फिर से शेड्यूल करनी चाहिए?","kya hamein meeting phir se schedule karni chahiye"], fr:"Devrions-nous reporter la réunion ?"},
+        {en:"I'm available next Tuesday.", zh:["我下周二有空。","wǒ xià zhōu'èr yǒu kòng"], de:"Ich habe nächsten Dienstag Zeit.", es:"Estoy disponible el próximo martes.", hi:["मैं अगले मंगलवार को उपलब्ध हूँ।","main agle mangalvaar ko upalabdh hoon"], fr:"Je suis disponible mardi prochain."},
+        {en:"Let's finalize the details.", zh:["我们来敲定细节吧。","wǒmen lái qiāodìng xìjié ba"], de:"Lass uns die Details festlegen.", es:"Vamos a finalizar los detalles.", hi:["चलिए विवरण अंतिम रूप देते हैं।","chaliye vivaran antim roop dete hain"], fr:"Finalisons les détails."}]},
+      {title:"Travel Emergencies", icon:"🧳", items:[
+        {en:"I think I've lost my passport.", zh:["我想我把护照弄丢了。","wǒ xiǎng wǒ bǎ hùzhào nòngdiū le"], de:"Ich glaube, ich habe meinen Reisepass verloren.", es:"Creo que he perdido mi pasaporte.", hi:["मुझे लगता है मेरा पासपोर्ट खो गया है।","mujhe lagta hai mera passport kho gaya hai"], fr:"Je crois que j'ai perdu mon passeport."},
+        {en:"Could you call a doctor?", zh:["你能叫医生吗？","nǐ néng jiào yīshēng ma"], de:"Könnten Sie einen Arzt rufen?", es:"¿Podría llamar a un médico?", hi:["क्या आप डॉक्टर को बुला सकते हैं?","kya aap doctor ko bula sakte hain"], fr:"Pourriez-vous appeler un médecin ?"},
+        {en:"Where is the nearest embassy?", zh:["最近的大使馆在哪里？","zuìjìn de dàshǐguǎn zài nǎlǐ"], de:"Wo ist die nächste Botschaft?", es:"¿Dónde está la embajada más cercana?", hi:["सबसे नज़दीकी दूतावास कहाँ है?","sabse nazdeeki dootavaas kahaan hai"], fr:"Où est l'ambassade la plus proche ?"}]},
+      {title:"Health & Wellness", icon:"🏥", items:[
+        {en:"I haven't been feeling well lately.", zh:["我最近感觉不太好。","wǒ zuìjìn gǎnjué bù tài hǎo"], de:"Ich fühle mich in letzter Zeit nicht gut.", es:"No me he sentido bien últimamente.", hi:["मुझे हाल ही में ठीक महसूस नहीं हो रहा।","mujhe haal hi mein theek mehsoos nahin ho raha"], fr:"Je ne me sens pas très bien ces derniers temps."},
+        {en:"How often should I take this medicine?", zh:["这个药我应该多久吃一次？","zhège yào wǒ yīnggāi duōjiǔ chī yīcì"], de:"Wie oft sollte ich dieses Medikament einnehmen?", es:"¿Con qué frecuencia debo tomar este medicamento?", hi:["मुझे यह दवा कितनी बार लेनी चाहिए?","mujhe yeh dawa kitni baar leni chahiye"], fr:"À quelle fréquence dois-je prendre ce médicament ?"}]},
+      {title:"Tech & Social Media", icon:"📱", items:[
+        {en:"My phone battery is almost dead.", zh:["我的手机快没电了。","wǒ de shǒujī kuài méi diàn le"], de:"Mein Handyakku ist fast leer.", es:"La batería de mi teléfono está casi agotada.", hi:["मेरे फोन की बैटरी लगभग खत्म हो गई है।","mere phone ki battery lagbhag khatam ho gayi hai"], fr:"La batterie de mon téléphone est presque vide."},
+        {en:"Could you send me the link?", zh:["你能把链接发给我吗？","nǐ néng bǎ liànjiē fā gěi wǒ ma"], de:"Könntest du mir den Link schicken?", es:"¿Podrías enviarme el enlace?", hi:["क्या आप मुझे लिंक भेज सकते हैं?","kya aap mujhe link bhej sakte hain"], fr:"Pourrais-tu m'envoyer le lien ?"}]}
+    ]},
+  Advanced:{ icon:"🏆", desc:"Ready for fluency? Master business language, debate, and cultural nuance.",
+    modules:[
+      {title:"Business Introductions", icon:"💼", items:[
+        {en:"It's a pleasure to collaborate with your company.", zh:["很荣幸能与贵公司合作。","hěn róngxìng néng yǔ guì gōngsī hézuò"], de:"Es ist mir eine Freude, mit Ihrem Unternehmen zusammenzuarbeiten.", es:"Es un placer colaborar con su empresa.", hi:["आपकी कंपनी के साथ सहयोग करना खुशी की बात है।","aapki company ke saath sahyog karna khushi ki baat hai"], fr:"C'est un plaisir de collaborer avec votre entreprise."},
+        {en:"Let's discuss the terms of the contract.", zh:["我们来讨论一下合同条款吧。","wǒmen lái tǎolùn yīxià hétong tiáokuǎn ba"], de:"Lassen Sie uns die Vertragsbedingungen besprechen.", es:"Discutamos los términos del contrato.", hi:["आइए अनुबंध की शर्तों पर चर्चा करें।","aaiye anubandh ki sharton par charcha karein"], fr:"Discutons des termes du contrat."},
+        {en:"I'll follow up with an email.", zh:["我会通过邮件跟进的。","wǒ huì tōngguò yóujiàn gēnjìn de"], de:"Ich werde per E-Mail nachfassen.", es:"Haré seguimiento por correo electrónico.", hi:["मैं ईमेल के ज़रिए फॉलो-अप करूँगा।","main email ke zariye follow-up karunga"], fr:"Je ferai un suivi par e-mail."}]},
+      {title:"Debate & Persuasion", icon:"🎯", items:[
+        {en:"I'd like to challenge that assumption.", zh:["我想对这个假设提出质疑。","wǒ xiǎng duì zhège jiǎshè tíchū zhìyí"], de:"Ich möchte diese Annahme infrage stellen.", es:"Me gustaría cuestionar esa suposición.", hi:["मैं इस धारणा को चुनौती देना चाहता हूँ।","main is dharana ko chunauti dena chahta hoon"], fr:"J'aimerais remettre en question cette hypothèse."},
+        {en:"Let's consider the counterargument.", zh:["我们来考虑一下反驳意见吧。","wǒmen lái kǎolǜ yīxià fǎnbó yìjiàn ba"], de:"Lassen Sie uns das Gegenargument betrachten.", es:"Consideremos el contraargumento.", hi:["आइए प्रतिवाद पर विचार करें।","aaiye prativaad par vichaar karein"], fr:"Considérons le contre-argument."},
+        {en:"The evidence strongly suggests otherwise.", zh:["证据强烈表明并非如此。","zhèngjù qiángliè biǎomíng bìngfēi rúcǐ"], de:"Die Beweise deuten stark auf das Gegenteil hin.", es:"La evidencia sugiere fuertemente lo contrario.", hi:["सबूत दृढ़ता से इसके विपरीत संकेत देते हैं।","saboot dridhta se iske viparit sanket dete hain"], fr:"Les preuves suggèrent fortement le contraire."}]},
+      {title:"Idioms & Etiquette", icon:"🌏", items:[
+        {en:"Practice makes perfect.", zh:["熟能生巧。","shú néng shēng qiǎo"], de:"Übung macht den Meister.", es:"La práctica hace al maestro.", hi:["अभ्यास से ही सिद्धि मिलती है।","abhyaas se hi siddhi milti hai"], fr:"C'est en forgeant qu'on devient forgeron."},
+        {en:"Better late than never.", zh:["迟到总比不到好。","chídào zǒng bǐ bù dào hǎo"], de:"Besser spät als nie.", es:"Más vale tarde que nunca.", hi:["देर आए दुरुस्त आए।","der aaye durust aaye"], fr:"Mieux vaut tard que jamais."},
+        {en:"Actions speak louder than words.", zh:["行动胜于言辞。","xíngdòng shèng yú yáncí"], de:"Taten sagen mehr als Worte.", es:"Las acciones hablan más que las palabras.", hi:["कथनी से करनी भली।","kathni se karni bhali"], fr:"Les actes valent mieux que les paroles."}]},
+      {title:"Academic & Research", icon:"🎓", items:[
+        {en:"This study challenges conventional theory.", zh:["这项研究对传统理论提出了挑战。","zhè xiàng yánjiū duì chuántǒng lǐlùn tíchūle tiǎozhàn"], de:"Diese Studie stellt die konventionelle Theorie infrage.", es:"Este estudio desafía la teoría convencional.", hi:["यह अध्ययन पारंपरिक सिद्धांत को चुनौती देता है।","yeh adhyayan paramparik siddhant ko chunauti deta hai"], fr:"Cette étude remet en question la théorie conventionnelle."},
+        {en:"The results were statistically significant.", zh:["结果具有统计学意义。","jiéguǒ jùyǒu tǒngjìxué yìyì"], de:"Die Ergebnisse waren statistisch signifikant.", es:"Los resultados fueron estadísticamente significativos.", hi:["परिणाम सांख्यिकीय रूप से महत्वपूर्ण थे।","parinaam saankhyikiya roop se mahatvapurn the"], fr:"Les résultats étaient statistiquement significatifs."}]},
+      {title:"News & Current Events", icon:"📰", items:[
+        {en:"The economy has shown signs of recovery.", zh:["经济已显现复苏迹象。","jīngjì yǐ xiǎnxiàn fùsū jìxiàng"], de:"Die Wirtschaft zeigt Anzeichen einer Erholung.", es:"La economía ha mostrado señales de recuperación.", hi:["अर्थव्यवस्था में सुधार के संकेत दिखे हैं।","arthavyavastha mein sudhar ke sanket dikhe hain"], fr:"L'économie montre des signes de reprise."},
+        {en:"Public opinion remains divided on this issue.", zh:["公众舆论在这个问题上仍存在分歧。","gōngzhòng yúlùn zài zhège wèntí shàng réng cúnzài fēnqí"], de:"Die öffentliche Meinung ist zu diesem Thema weiterhin gespalten.", es:"La opinión pública sigue dividida sobre este tema.", hi:["इस मुद्दे पर जनमत अभी भी बंटा हुआ है।","is mudde par janmat abhi bhi banta hua hai"], fr:"L'opinion publique reste divisée sur cette question."}]}
+    ]},
+};
+const MASCOT_LINES = {
+  idle:["Ready for today's lesson? 🌱","One phrase a day keeps forgetting away!","Let's go — your streak is counting on you!"],
+  streakUp:["Streak extended! You're on fire 🔥","Nice! That's another day locked in.","Consistency looks good on you."],
+  streakLost:["Ouch, your streak broke 💔 Let's rebuild it today!","No streak? No problem — day 1 starts now.","Even champs miss a day. Come back stronger!"],
+  stageWin:["Module cleared! 🎉","Level-up energy right there.","Brain gains achieved 🧠✨"],
+  stageTry:["Good attempt — one more round will lock it in.","So close! Try the module again."],
+};
+
+// Every module cycles through a different mini-game so no two modules in a row feel the same.
+const GAME_TYPES = ['chat','builder','listen','speedmatch'];
+const GAME_META = {
+  chat:{label:'Chat Story', icon:'💬', tip:'Tap each message to reveal what it means, then quiz yourself.'},
+  builder:{label:'Sentence Builder', icon:'🧱', tip:'Tap the pieces in the right order to build each phrase.'},
+  listen:{label:'Listening Challenge', icon:'🎧', tip:'Listen closely, then pick what you heard.'},
+  speedmatch:{label:'Speed Match', icon:'⚡', tip:'Beat the clock and match every pair.'},
+};
+function gameForModule(idx){ return GAME_TYPES[idx % GAME_TYPES.length]; }
+function splitWords(str, lang){
+  const clean = str.replace(/[.,!?¿¡;:"«»""''、，。！？；：]/g,'').trim();
+  if(lang==='zh') return Array.from(clean).filter(c=>c.trim().length);
+  return clean.split(/\s+/).filter(Boolean);
+}
+function sayBtn(text, rate, cls){ return `<button type="button" class="sayBtn ${cls||''}" data-say="${encodeURIComponent(text)}" ${rate?`data-rate="${rate}"`:''} aria-label="${rate?'Play slowly':'Play audio'}" title="${rate?'Play slowly':'Play audio'}">${rate?'🐢':'🔊'}</button>`; }
+document.addEventListener('click',e=>{
+  const b=e.target.closest && e.target.closest('[data-say]'); if(!b) return;
+  e.stopPropagation(); e.preventDefault();
+  b.classList.add('playing'); setTimeout(()=>b.classList.remove('playing'),900);
+  speak(decodeURIComponent(b.dataset.say), S.lang, b.dataset.rate?+b.dataset.rate:undefined);
+},true);
+function withPron(t,pr){ return pr ? `${t}<small class="pron">${pr}</small>` : t; }
+function joinWords(arr, lang){ return lang==='zh' ? arr.join('') : arr.join(' '); }
+
+function speak(text, langKey, rate){
+  try{
+    if(!('speechSynthesis' in window) || !text) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = LANG_CODES[langKey] || 'en-US';
+    u.rate = rate || 0.92;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem('ll_'+k));return v==null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem('ll_'+k,JSON.stringify(v));}catch(e){}}};
+let S={
+  screen: 'splash',
+  user: store.get('profile', null),
+  lang: store.get('lang', null),
+  level: store.get('level', null),
+  progress: store.get('progress', {}),
+  xp: store.get('xp', 0),
+  streak: store.get('streak', 0),
+  lastActive: store.get('lastActive', null),
+  history: store.get('history', []),
+  srs: store.get('srs', {}),
+  tab:'home', regDraft:{}, formErr:'', showMenu:false, showTerms:false, showGoogle:false,
+  showReset:false, resetStep:'email', resetEmail:'', formErr2:'', screenHistory:[], homeAudioPlayed:false,
+  googleStep:'chooser', formErr3:'',
+};
+function goScreen(next){ S.screenHistory.push(S.screen); S.screen=next; S.formErr=''; render(); }
+function goBack(fallback){ const prev=S.screenHistory.pop(); S.screen=prev||fallback||'splash'; S.formErr=''; render(); }
+
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function toast(msg){const el=document.getElementById('toast');el.textContent="🦉 "+msg;el.classList.add('show');clearTimeout(window._t);window._t=setTimeout(()=>el.classList.remove('show'),3000);}
+function updateStreakOnLoad(){ if(!S.lastActive) return; if(daysBetween(S.lastActive,todayStr())>=2){S.streak=0;store.set('streak',0);toast(pick(MASCOT_LINES.streakLost));} }
+function touchToday(){const t=todayStr(); if(S.lastActive===t) return; const gap=S.lastActive?daysBetween(S.lastActive,t):1; S.streak=gap===1?S.streak+1:1; S.lastActive=t; store.set('streak',S.streak);store.set('lastActive',t); toast(pick(MASCOT_LINES.streakUp));}
+function addXP(n){S.xp+=n;store.set('xp',S.xp); const h=S.history,t=todayStr(); let d=h.find(x=>x.date===t); if(!d){d={date:t,xp:0,correct:0,total:0};h.push(d);if(h.length>30)h.shift();} d.xp+=n; store.set('history',h);}
+function logAnswer(word,ok){const t=todayStr(),h=S.history; let d=h.find(x=>x.date===t); if(!d){d={date:t,xp:0,correct:0,total:0};h.push(d);} d.total++; if(ok)d.correct++; store.set('history',h);
+  const box=(S.srs[word]?.box)||0, nb=ok?Math.min(box+1,4):Math.max(box-1,0), iv=[0,1,2,4,7]; const due=new Date();due.setDate(due.getDate()+iv[nb]); S.srs[word]={box:nb,due:due.toISOString().slice(0,10)}; store.set('srs',S.srs);}
+function progKey(){return S.lang+'__'+(S.level||'Beginner');}
+function langProgress(){return S.progress[progKey()]||0;}
+function itemTuple(it){ const v=it[S.lang]; const arr=Array.isArray(v)?v:[v,'']; return [it.en, arr[0], arr[1]]; }
+function levelModules(){ return (LEVEL_DATA[S.level||'Beginner']||LEVEL_DATA.Beginner).modules; }
+function allItems(){ return Object.values(LEVEL_DATA).flatMap(l=>l.modules.flatMap(m=>m.items)); }
+function greetingFor(lang){ return itemTuple(LEVEL_DATA.Beginner.modules[0].items[0])[1]; }
+
+function mascotSVG(size=74){
+  return `<svg class="mascot" viewBox="0 0 100 100" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+    <g class="mFoot"><ellipse cx="40" cy="92" rx="9" ry="4" fill="var(--gold)"/><ellipse cx="60" cy="92" rx="9" ry="4" fill="var(--gold)"/></g>
+    <ellipse cx="50" cy="58" rx="34" ry="32" fill="var(--accent)"/><ellipse cx="50" cy="30" rx="22" ry="20" fill="var(--accent)"/>
+    <g class="mWingL"><ellipse cx="14" cy="62" rx="7" ry="16" fill="var(--accent-dark)"/></g>
+    <g class="mWingR"><ellipse cx="86" cy="62" rx="7" ry="16" fill="var(--accent-dark)"/></g>
+    <circle cx="41" cy="28" r="8" fill="#fff"/><circle cx="59" cy="28" r="8" fill="#fff"/>
+    <g class="mascotEyes"><g class="mPupils"><circle cx="41" cy="28" r="3.4" fill="#1c1f2e"/><circle cx="59" cy="28" r="3.4" fill="#1c1f2e"/></g></g>
+    <polygon points="50,34 45,40 55,40" fill="var(--gold)"/>
+    <path d="M20 20 L30 30" stroke="var(--accent-dark)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M80 20 L70 30" stroke="var(--accent-dark)" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="50" cy="66" rx="14" ry="10" fill="#fff" opacity=".25"/></svg>`;
+}
+function themeKey(){
+  const neutralScreens=['splash','register','login'];
+  if(neutralScreens.includes(S.screen) || !S.lang) return 'neutral';
+  return S.lang;
+}
+function renderMotif(){
+  const cul=CULTURE[themeKey()];
+  const spots=[
+    {t:'4%',l:'6%',s:60,r:-12},{t:'10%',l:'88%',s:48,r:14},{t:'32%',l:'-3%',s:66,r:-6},
+    {t:'44%',l:'93%',s:42,r:10},{t:'60%',l:'9%',s:46,r:8},{t:'68%',l:'80%',s:58,r:-10},
+    {t:'86%',l:'30%',s:44,r:14},{t:'90%',l:'66%',s:52,r:-8},
+  ];
+  document.getElementById('bgMotif').innerHTML = spots.map((sp,i)=>`<span style="top:${sp.t};left:${sp.l};font-size:${sp.s}px;--r:${sp.r}deg;animation-delay:${(i*0.35).toFixed(2)}s;">${cul.icons[i%cul.icons.length]}</span>`).join('');
+}
+
+function render(){
+  document.documentElement.setAttribute('data-lang', themeKey());
+  renderMotif();
+  document.body.classList.toggle('homeMode', !['splash','register','langSelect','levelSelect','journey','login','welcome'].includes(S.screen) && S.tab==='home' && !stageCtx);
+  const app=document.getElementById('app'), tb=document.getElementById('tabbar');
+  const authScreens=['splash','register','langSelect','levelSelect','journey','login','welcome'];
+  if(authScreens.includes(S.screen)){ tb.classList.add('hide'); app.innerHTML=`<div class="wrap">${authView()}</div>${S.showTerms?termsModalHTML():''}${S.showGoogle?googleModalHTML():''}${S.showReset?resetModalHTML():''}`; bindAuth(); return; }
+  tb.classList.remove('hide');
+  app.innerHTML = `<div class="wrap">${topbar()}${tabsHTML()}${screen()}</div>`;
+  tb.innerHTML = tabbarHTML();
+  bind();
+}
+
+function authView(){
+  if(S.screen==='splash') return splashView();
+  if(S.screen==='register') return registerView();
+  if(S.screen==='langSelect') return langSelectView();
+  if(S.screen==='levelSelect') return levelSelectView();
+  if(S.screen==='journey') return journeyView();
+  if(S.screen==='login') return loginView();
+  if(S.screen==='welcome') return welcomeView();
+}
+function splashView(){
+  return `<div class="authScreen splashScreen">
+    <div class="splashHero"><div class="heroGlow"></div>
+      ${mascotSVG(84)}<h1>FluentFlow</h1><p class="motto">Small daily steps to real fluency.</p>
+      <div class="featChips"><span class="chip">🔥 Daily streaks</span><span class="chip">🗣️ Real phrases</span><span class="chip">🌍 5 languages</span></div>
+    </div>
+    <div class="authCard">
+      <button class="btn primary" id="goReg" style="margin-bottom:10px;">Register</button>
+      <button class="btn ghost" id="goLogin">Login</button>
+    </div></div>`;
+}
+function registerView(){
+  const d=S.regDraft;
+  return `<div class="authScreen" style="padding-top:20px;padding-bottom:24px;"><button class="backBtn" data-back="splash">← Back</button><div class="logoRow" style="margin-bottom:14px;">${mascotSVG(44)}<h1 style="font-size:20px;margin-top:4px;">Create your account</h1></div>
+  <div class="authCard">
+    <div class="fieldGrid">
+      <div class="field"><label>Name</label><input id="rName" value="${d.name||''}" placeholder="Amruta Nimbalkar"></div>
+      <div class="field"><label>Username</label><input id="rUser" value="${d.username||''}" placeholder="amruta_codes"></div>
+    </div>
+    <div class="fieldGrid">
+      <div class="field"><label>Email</label><input id="rEmail" type="email" value="${d.email||''}" placeholder="you@example.com"></div>
+      <div class="field"><label>Contact</label><input id="rContact" value="${d.contact||''}" placeholder="+91 9XXXXXXXXX"></div>
+    </div>
+    <div class="fieldGrid">
+      <div class="field"><label>Password</label><input id="rPass" type="password" placeholder="Min 6 characters"></div>
+      <div class="field"><label>Confirm Password</label><input id="rPass2" type="password" placeholder="Re-enter password"></div>
+    </div>
+    ${S.formErr?`<div class="errText" style="margin-top:0;">${S.formErr}</div>`:''}
+    <div class="checkRow"><input type="checkbox" id="rAgree" ${d.agree?'checked':''}><span>I agree to the <a href="#" id="openTerms">Terms &amp; Privacy Policy</a></span></div>
+    <button class="btn primary" id="regNext">Continue</button>
+  </div><p class="switchLine">Already have an account? <b id="toLogin">Log in</b></p></div>`;
+}
+function langSelectView(){
+  const inSwitch = S.tab==='langSwitch';
+  const backHtml = inSwitch
+    ? `<button class="backBtn" data-back-tab="home">← Back</button>`
+    : `<button class="backBtn" data-back="register">← Back</button>`;
+  return `<div class="authScreen" style="max-width:560px;">${backHtml}${inSwitch?'':'<div class="stepDots"><span class="on"></span><span></span><span></span></div>'}
+  <div class="logoRow"><h1 style="font-size:22px;">${inSwitch?'Switch your language':'Which language do you want to learn?'}</h1></div>
+  <div class="grid5">${Object.entries(LANGS).map(([c,l])=>`
+    <div class="langCard ${S.lang===c?'sel':''}" data-pick="${c}">
+      <div class="flag">${l.flag}</div><div class="name">${l.name}</div><div class="speakers">${l.speakers}</div>
+    </div>`).join('')}</div>
+  <button class="btn primary" style="margin-top:20px;" id="langNext" ${S.lang?'':'disabled'}>${inSwitch?'Save':'Continue'}</button>
+  </div>`;
+}
+function levelSelectView(){
+  const levels=["Beginner","Basic","Intermediate","Advanced"];
+  return `<div class="authScreen" style="max-width:480px;padding-top:22px;padding-bottom:24px;"><button class="backBtn" data-back="langSelect">← Back</button><div class="stepDots"><span class="on"></span><span class="on"></span><span></span></div>
+  <div class="logoRow" style="margin-bottom:14px;"><h1 style="font-size:20px;">Tell us your level</h1><p class="motto">Every level unlocks its own set of modules.</p></div>
+  <div class="levelGrid">${levels.map(l=>`<div class="levelCard ${S.level===l?'sel':''}" data-level="${l}"><div class="lic">${LEVEL_DATA[l].icon}</div><div><b>${l}</b><p>${LEVEL_DATA[l].desc}</p></div></div>`).join('')}</div>
+  <button class="btn primary" id="levelNext" ${S.level?'':'disabled'}>Continue</button>
+  </div>`;
+}
+function journeyView(){
+  return `<div class="authScreen"><button class="backBtn" data-back="levelSelect">← Back</button><div class="stepDots"><span class="on"></span><span class="on"></span><span class="on"></span></div>
+  <div class="logoRow">${mascotSVG(70)}<h1 style="font-size:22px;">Personalized journey created!</h1><p class="motto">It connects everything into your ${LANGS[S.lang].name} roadmap, starting at ${S.level} level.</p></div>
+  <div class="authCard"><button class="btn primary" id="toLoginFromJourney">Continue to Login</button></div></div>`;
+}
+function loginView(){
+  return `<div class="authScreen"><button class="backBtn" data-back="splash">← Back</button><div class="logoRow">${mascotSVG(56)}<h1 style="font-size:22px;">Welcome back</h1></div>
+  <div class="authCard">
+    <div class="field"><label>Email / Username</label><input id="lUser" placeholder="you@example.com"></div>
+    <div class="field"><label>Password</label><input id="lPass" type="password" placeholder="••••••••"></div>
+    <div style="text-align:right;margin:-6px 0 14px;"><a href="#" id="forgotPass" style="font-size:12px;">Forgot password?</a></div>
+    ${S.formErr?`<div class="errText">${S.formErr}</div>`:''}
+    <button class="btn primary" id="doLogin">Login</button>
+    <div class="divider">OR</div>
+    <button class="btn google" id="googleLogin"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:none;"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.5 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-7.6l-6.5 5C9.6 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C39.9 36.6 44 31 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg> Continue with Google</button>
+  </div><p class="switchLine">New here? <b id="toRegister">Create an account</b></p></div>`;
+}
+function sparkleSpans(){
+  const pts=[{sx:'-70px',sy:'-60px'},{sx:'70px',sy:'-60px'},{sx:'-80px',sy:'20px'},{sx:'80px',sy:'20px'},{sx:'0px',sy:'-95px'},{sx:'0px',sy:'85px'}];
+  const ic=['✨','⭐','✨','💫','⭐','✨'];
+  return pts.map((p,i)=>`<span style="--sx:${p.sx};--sy:${p.sy};animation-delay:${i*70}ms;">${ic[i]}</span>`).join('');
+}
+function welcomeView(){
+  return `<div class="authScreen welcomeScreen">
+    <div class="mascotStage" id="wStage"><div class="wBubble" id="wBubble"></div><div class="mascotBig" id="wMascot"><div class="mReact" id="wReact">${mascotSVG(130)}</div></div><div class="sparkles" id="wSparkles">${sparkleSpans()}</div></div>
+    <div class="welcomeText" id="wText">
+      <h1 style="margin-top:10px;">${greetingFor(S.lang)}</h1>
+      <p class="motto">Welcome${S.user?.name?', '+S.user.name:''}! Your ${LANGS[S.lang].name} journey starts now.</p>
+      <button class="btn primary" id="skipWelcome" style="max-width:220px;margin:18px auto 0;">Let's go →</button>
+    </div>
+  </div>`;
+}
+function termsModalHTML(){
+  return `<div class="modalOverlay" id="termsOverlay"><div class="modalCard">
+    <h3>Terms &amp; Privacy Policy</h3>
+    <div style="font-size:13px;color:var(--sub);line-height:1.65;max-height:48vh;overflow:auto;margin-bottom:16px;">
+      <p><b>1. Demo application.</b> FluentFlow is a student capstone project built for educational and portfolio purposes — it is not a commercial product.</p>
+      <p><b>2. Data storage.</b> Anything you enter (name, username, email, contact, password) is stored only in your own browser's local storage. Nothing is sent to or stored on a remote server.</p>
+      <p><b>3. No real authentication.</b> Login credentials are not encrypted or verified by any backend service — please do not reuse a real password here.</p>
+      <p><b>4. Content.</b> Language content is provided for practice purposes and may be simplified for teaching clarity.</p>
+      <p><b>5. Changes.</b> These terms may be updated as the project continues to develop.</p>
+    </div>
+    <button class="btn primary" id="closeTerms">Close</button>
+  </div></div>`;
+}
+function googleModalHTML(){
+  const nm=S.regDraft.name||S.user?.name||'Amruta Nimbalkar', em=S.regDraft.email||S.user?.email||'amruta.nimbalkar@gmail.com';
+  if(S.googleStep==='email'){
+    return `<div class="modalOverlay" id="googleOverlay"><div class="modalCard">
+      <h3>Sign in with Google</h3>
+      <p style="font-size:12.5px;color:var(--sub);margin-top:-6px;">Enter the email you'd like to continue with.</p>
+      <div class="field"><label>Email</label><input id="gEmail" type="email" placeholder="you@gmail.com" value="${S.googleEmail||''}"></div>
+      <div class="field"><label>Name</label><input id="gName" placeholder="Your name" value="${S.googleName||''}"></div>
+      ${S.formErr3?`<div class="errText">${S.formErr3}</div>`:''}
+      <button class="btn primary" id="gContinue">Continue</button>
+      <button class="btn ghost" id="gBackChooser" style="margin-top:8px;">← Back</button>
+    </div></div>`;
+  }
+  return `<div class="modalOverlay" id="googleOverlay"><div class="modalCard">
+    <h3>Choose an account</h3>
+    <div class="gAccount" data-gacct="demo"><div class="gAvatar">${nm[0].toUpperCase()}</div><div><div style="font-weight:700;">${nm}</div><div style="font-size:12px;color:var(--sub);">${em}</div></div></div>
+    <div class="gAccount" data-gacct="new"><div class="gAvatar">+</div><div style="font-weight:700;">Use another account</div></div>
+    <button class="btn ghost" id="closeGoogle" style="margin-top:6px;">Cancel</button>
+  </div></div>`;
+}
+function resetModalHTML(){
+  if((S.resetStep||'email')==='email'){
+    return `<div class="modalOverlay" id="resetOverlay"><div class="modalCard">
+      <h3>Reset your password</h3>
+      <p style="font-size:13px;color:var(--sub);margin-top:-6px;">Enter the email you registered with and we'll let you set a new password.</p>
+      <div class="field"><label>Registered Email</label><input id="rsEmail" placeholder="you@example.com" value="${S.resetEmail||''}"></div>
+      ${S.formErr2?`<div class="errText">${S.formErr2}</div>`:''}
+      <button class="btn primary" id="rsFind">Find Account</button>
+      <button class="btn ghost" id="closeReset" style="margin-top:8px;">Cancel</button>
+    </div></div>`;
+  }
+  return `<div class="modalOverlay" id="resetOverlay"><div class="modalCard">
+    <h3>Set a new password</h3>
+    <div class="field"><label>New Password</label><input id="rsPass" type="password" placeholder="At least 6 characters"></div>
+    <div class="field"><label>Confirm Password</label><input id="rsPass2" type="password" placeholder="Re-enter password"></div>
+    ${S.formErr2?`<div class="errText">${S.formErr2}</div>`:''}
+    <button class="btn primary" id="rsSave">Save New Password</button>
+    <button class="btn ghost" id="closeReset" style="margin-top:8px;">Cancel</button>
+  </div></div>`;
+}
+const WELCOME_LINES=["Hehe, that tickles! 😆","Again! Again! 🎉","I'm ready when you are! 🚀","You're doing great already 💚","Practice beats perfect! ✨","Let's learn something new! 📚","Boing! 🦘"];
+let wTaps=0, wLast=0;
+function wBubbleSay(t){ const b=document.getElementById('wBubble'); if(!b) return; b.textContent=t; b.classList.add('show'); clearTimeout(window._wBT); window._wBT=setTimeout(()=>b.classList.remove('show'),2800); }
+function fxBurst(host, list){
+  if(!host) return;
+  for(let i=0;i<9;i++){
+    const s=document.createElement('span'); s.className='fxPart'; s.textContent=list[i%list.length];
+    const a=Math.random()*Math.PI*2, d=60+Math.random()*60;
+    s.style.setProperty('--dx',(Math.cos(a)*d).toFixed(0)+'px'); s.style.setProperty('--dy',(Math.sin(a)*d-30).toFixed(0)+'px');
+    host.appendChild(s); setTimeout(()=>s.remove(),1000);
+  }
+}
+function mascotAct(act){
+  const r=document.getElementById('wReact'); if(!r) return;
+  r.className='mReact'; void r.offsetWidth; r.classList.add('act-'+act);
+  clearTimeout(window._wAT); window._wAT=setTimeout(()=>{ const rr=document.getElementById('wReact'); if(rr) rr.className='mReact'; },1100);
+}
+function mascotReact(){
+  const m=document.getElementById('wMascot'); if(!m || !m.classList.contains('pop')) return;
+  wTaps++; wLast=Date.now();
+  m.classList.remove('waving');
+  const acts=['jump','spin','wiggle','flip'];
+  if(wTaps%5===0){ mascotAct('dizzy'); wBubbleSay('Whoa… I\'m dizzy! 😵‍💫 Ready to learn?'); fxBurst(document.getElementById('wStage'),['💫','⭐','😵‍💫']); return; }
+  mascotAct(acts[(wTaps-1)%acts.length]);
+  wBubbleSay(WELCOME_LINES[(wTaps-1)%WELCOME_LINES.length]);
+  fxBurst(document.getElementById('wStage'),['💚','⭐','✨','💛']);
+}
+function goWelcome(){
+  S.screen='welcome'; S.homeAudioPlayed=false; wTaps=0; wLast=Date.now(); render();
+  clearTimeout(window._welcomeT1); clearTimeout(window._welcomeT2); clearTimeout(window._welcomeT3); clearInterval(window._wIdle);
+  // Character appears 2s after arriving here, then everything just waits for the user to tap "Let's go →".
+  window._welcomeT1=setTimeout(()=>{
+    const m=document.getElementById('wMascot'); if(m) m.classList.add('pop','waving');
+    const sp=document.getElementById('wSparkles'); if(sp) sp.classList.add('burst');
+    setTimeout(()=>wBubbleSay('Hi'+(S.user?.name?' '+S.user.name.split(' ')[0]:'')+'! 👋 Tap me!'),500);
+    setTimeout(()=>{ const mm=document.getElementById('wMascot'); if(mm) mm.classList.remove('waving'); },4500);
+    wLast=Date.now();
+  }, 2000);
+  window._welcomeT2=setTimeout(()=>{
+    const t=document.getElementById('wText'); if(t) t.classList.add('show');
+    speak(greetingFor(S.lang), S.lang);
+  }, 2900);
+  // if the user goes quiet, the character nudges them
+  window._wIdle=setInterval(()=>{
+    if(S.screen!=='welcome'){ clearInterval(window._wIdle); return; }
+    const m=document.getElementById('wMascot'); if(!m || !m.classList.contains('pop')) return;
+    if(Date.now()-wLast>6000){ wLast=Date.now(); mascotAct('wiggle'); wBubbleSay('Psst… tap me! 👆'); }
+  },1000);
+}
+function leaveWelcome(){
+  clearTimeout(window._welcomeT1); clearTimeout(window._welcomeT2); clearInterval(window._wIdle);
+  S.screen='home'; render();
+}
+// every mascot's eyes (and the big one's head) follow the finger / cursor
+let _eyeRaf=0;
+function trackEyes(x,y){
+  document.querySelectorAll('svg.mascot').forEach(svg=>{
+    const g=svg.querySelector('.mPupils'); if(!g) return;
+    const r=svg.getBoundingClientRect(); if(!r.width) return;
+    const cx=r.left+r.width/2, cy=r.top+r.height*0.3;
+    const dx=x-cx, dy=y-cy, d=Math.hypot(dx,dy)||1, k=Math.min(1,d/180);
+    g.style.transform='translate('+(dx/d*2.8*k).toFixed(2)+'px,'+(dy/d*2.3*k).toFixed(2)+'px)';
+    if(r.width>=80) svg.style.transform='rotate('+(dx/d*7*k).toFixed(1)+'deg)';
+  });
+}
+['pointermove','pointerdown'].forEach(ev=>document.addEventListener(ev,e=>{
+  if(_eyeRaf) return; _eyeRaf=requestAnimationFrame(()=>{ _eyeRaf=0; trackEyes(e.clientX,e.clientY); });
+},{passive:true}));
+function bindAuth(){
+  const $=id=>document.getElementById(id);
+  const bb=document.querySelector('[data-back]'); if(bb) bb.onclick=()=>goBack(bb.dataset.back);
+  const openTerms=document.getElementById('openTerms'); if(openTerms) openTerms.onclick=(e)=>{e.preventDefault(); S.showTerms=true; render();};
+  const closeTerms=document.getElementById('closeTerms'); if(closeTerms) closeTerms.onclick=()=>{S.showTerms=false; render();};
+  const closeGoogle=document.getElementById('closeGoogle'); if(closeGoogle) closeGoogle.onclick=()=>{S.showGoogle=false; S.googleStep='chooser'; S.formErr3=''; render();};
+  const gBackChooser=document.getElementById('gBackChooser'); if(gBackChooser) gBackChooser.onclick=()=>{S.googleStep='chooser'; S.formErr3=''; render();};
+  const gContinue=document.getElementById('gContinue'); if(gContinue) gContinue.onclick=()=>{
+    const email=document.getElementById('gEmail').value.trim(), name=document.getElementById('gName').value.trim();
+    S.googleEmail=email; S.googleName=name;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ S.formErr3='Enter a valid email address.'; render(); return; }
+    if(name.length<2){ S.formErr3='Enter your name.'; render(); return; }
+    const username=(email.split('@')[0]||'user').toLowerCase().replace(/[^a-z0-9_.]/g,'').slice(0,20)||'user';
+    const profile={name, username, email:email.toLowerCase(), contact:'—'};
+    store.set('profile',profile); store.set('credentials',{email:email.toLowerCase(),username,password:'google-oauth'});
+    S.user=profile; if(!S.lang) S.lang=store.get('lang','zh'); if(!S.level) S.level=store.get('level','Beginner');
+    S.showGoogle=false; S.googleStep='chooser'; S.googleEmail=''; S.googleName=''; S.formErr3='';
+    updateStreakOnLoad(); goWelcome();
+  };
+  const closeReset=document.getElementById('closeReset'); if(closeReset) closeReset.onclick=()=>{S.showReset=false; S.resetStep='email'; S.formErr2=''; render();};
+  const rsFind=document.getElementById('rsFind'); if(rsFind) rsFind.onclick=()=>{
+    const em=document.getElementById('rsEmail').value.trim().toLowerCase();
+    const creds=store.get('credentials',null);
+    if(!em){ S.formErr2='Enter your registered email.'; render(); return; }
+    if(!creds || creds.email!==em){ S.formErr2='No account found with that email.'; render(); return; }
+    S.resetEmail=em; S.resetStep='newpass'; S.formErr2=''; render();
+  };
+  const rsSave=document.getElementById('rsSave'); if(rsSave) rsSave.onclick=()=>{
+    const p1=document.getElementById('rsPass').value, p2=document.getElementById('rsPass2').value;
+    if(p1.length<6){ S.formErr2='Password must be at least 6 characters.'; render(); return; }
+    if(p1!==p2){ S.formErr2='Passwords do not match.'; render(); return; }
+    const creds=store.get('credentials',null); creds.password=p1; store.set('credentials',creds);
+    S.showReset=false; S.resetStep='email'; S.formErr2=''; toast('Password updated — please log in.'); render();
+  };
+  document.querySelectorAll('[data-gacct]').forEach(el=>el.onclick=()=>{
+    const which=el.dataset.gacct;
+    if(which==='new'){ S.googleStep='email'; render(); return; }
+    S.showGoogle=false;
+    let profile=store.get('profile',null);
+    if(!profile){ profile={name:'Amruta Nimbalkar', username:'amruta_nimbalkar', email:'amruta.nimbalkar@gmail.com', contact:'—'}; store.set('profile',profile); store.set('credentials',{email:'amruta.nimbalkar@gmail.com',username:'amruta_nimbalkar',password:'google-oauth'}); }
+    S.user=profile; if(!S.lang) S.lang=store.get('lang','zh'); if(!S.level) S.level=store.get('level','Beginner');
+    S.formErr=''; updateStreakOnLoad(); goWelcome();
+  });
+  if(S.screen==='splash'){ $('goReg').onclick=()=>goScreen('register'); $('goLogin').onclick=()=>goScreen('login'); }
+  if(S.screen==='register'){
+    $('regNext').onclick=()=>{
+      const name=$('rName').value.trim(), username=$('rUser').value.trim(), email=$('rEmail').value.trim(), contact=$('rContact').value.trim(), pass=$('rPass').value, pass2=$('rPass2').value, agree=$('rAgree').checked;
+      S.regDraft={name,username,email,contact,agree};
+      if(!name||!username||!email||!contact||!pass||!pass2){ S.formErr='Please fill in every field.'; render(); return; }
+      if(name.length<2){ S.formErr='Please enter your full name.'; render(); return; }
+      if(!/^[a-zA-Z0-9_.]{3,20}$/.test(username)){ S.formErr='Username must be 3–20 characters (letters, numbers, _ or . only).'; render(); return; }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ S.formErr='Please enter a valid email address.'; render(); return; }
+      if(!/^\+?[0-9]{7,15}$/.test(contact.replace(/[\s-]/g,''))){ S.formErr='Please enter a valid contact number (7–15 digits).'; render(); return; }
+      if(pass.length<6){ S.formErr='Password must be at least 6 characters.'; render(); return; }
+      if(pass!==pass2){ S.formErr='Passwords do not match.'; render(); return; }
+      if(!agree){ S.formErr='Please accept the Terms & Privacy Policy.'; render(); return; }
+      store.set('profile',{name,username,email,contact});
+      store.set('credentials',{email:email.toLowerCase(),username:username.toLowerCase(),password:pass});
+      S.lang=null; S.level=null; goScreen('langSelect');
+    };
+    $('toLogin').onclick=()=>goScreen('login');
+  }
+  if(S.screen==='langSelect'){
+    document.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>{S.lang=el.dataset.pick; render();});
+    $('langNext').onclick=()=>{ store.set('lang',S.lang); goScreen('levelSelect'); };
+  }
+  if(S.screen==='levelSelect'){
+    document.querySelectorAll('[data-level]').forEach(el=>el.onclick=()=>{S.level=el.dataset.level; render();});
+    $('levelNext').onclick=()=>{ store.set('level',S.level); goScreen('journey'); };
+  }
+  if(S.screen==='journey'){ $('toLoginFromJourney').onclick=()=>goScreen('login'); }
+  if(S.screen==='login'){
+    $('doLogin').onclick=()=>{
+      const u=$('lUser').value.trim().toLowerCase(), p=$('lPass').value;
+      const creds=store.get('credentials',null);
+      if(!u||!p){ S.formErr='Enter your email/username and password.'; render(); return; }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u) && !/^[a-zA-Z0-9_.]{3,20}$/.test(u)){ S.formErr='Enter a valid email or username.'; render(); return; }
+      if(!creds){ S.formErr='No account found — please register first.'; render(); return; }
+      if((u!==creds.email && u!==creds.username) || p!==creds.password){ S.formErr='Incorrect email/username or password.'; render(); return; }
+      S.user=store.get('profile',null); if(!S.lang) S.lang=store.get('lang','zh'); if(!S.level) S.level=store.get('level','Beginner');
+      S.formErr=''; updateStreakOnLoad(); goWelcome();
+    };
+    $('googleLogin').onclick=()=>{ S.showGoogle=true; render(); };
+    $('forgotPass').onclick=e=>{ e.preventDefault(); S.showReset=true; S.resetStep='email'; S.resetEmail=''; S.formErr2=''; render(); };
+    $('toRegister').onclick=()=>goScreen('register');
+  }
+  if(S.screen==='welcome'){
+    const sw=$('skipWelcome');
+    sw.onmouseenter=()=>{ const m=$('wMascot'); if(m && m.classList.contains('pop')){ mascotAct('jump'); wBubbleSay('Yes! Let\'s go! 🚀'); } };
+    sw.onclick=()=>{
+      const m=$('wMascot');
+      if(m && m.classList.contains('pop')){ mascotAct('jump'); wBubbleSay('Let\'s goooo! 🚀'); fxBurst($('wStage'),['🎉','⭐','✨','💚']); setTimeout(leaveWelcome,650); }
+      else leaveWelcome();
+    };
+    const wm=$('wMascot');
+    if(wm) wm.onclick=()=>mascotReact();
+  }
+}
+
+function topbar(){
+  const initial=(S.user?.name||'?')[0].toUpperCase();
+  if(!S.homeBubbleLine) S.homeBubbleLine=pick(MASCOT_LINES.idle);
+  return `<div class="topbar">
+    <div class="brand"><span class="dot"></span>FluentFlow</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div class="stat">🔥 ${S.streak}</div><div class="stat">⭐ ${S.xp} XP</div>
+      <div class="avatarWrap">
+        <div class="avatar" id="avatarBtn">${initial}</div>
+        ${S.showMenu?`<div class="avatarMenu">
+          <div class="amName">${S.user?.name||''}</div>
+          <button data-menu="profile">👤 Profile</button>
+          <button data-menu="dashboard">📊 Dashboard</button>
+          <button data-menu="logout">🚪 Logout</button>
+        </div>`:''}
+      </div>
+    </div>
+  </div>
+  <div class="mascotRow card"><div>${mascotSVG(50)}</div>
+    <div class="bubble"><span id="mascotBubble">${greetingFor(S.lang)} — ${S.homeBubbleLine}</span></div>
+  </div>`;
+}
+function tabsHTML(){
+  const done=langProgress(), total=levelModules().length, left=Math.max(0,total-done);
+  const info={
+    home: stageCtx ? {t:levelModules()[stageCtx.idx]?.title||'Lesson', s: stageCtx.phase==='result' ? 'Here\'s the full breakdown.' : (GAME_META[stageCtx.game]?.tip || 'Keep going!')}
+      : {t:`${LANGS[S.lang].flag} ${LANGS[S.lang].name} journey`, s: left===0?`All ${total} modules done — you're fluent-ish! 🏆`:`${done}/${total} modules cleared · ${left} to go${S.streak?` · 🔥 ${S.streak}-day streak`:''}`},
+    match:{t:'Match Game', s:'Clear the board fast for bonus XP.'},
+    stats:{t:'Your Progress', s:`Level ${Math.floor(S.xp/100)+1} · ${S.xp} XP banked so far.`},
+    profile:{t:'Your Profile', s:'Account details and learning setup.'},
+    langSwitch:{t:'Switch Language', s:'Pick a new language to learn.'},
+  };
+  const cur=info[S.tab]||info.home;
+  return `<div class="sectionHead"><h2>${cur.t}</h2><p>${cur.s}</p></div>`;
+}
+function tabbarHTML(){
+  const tabs=[['home','🗺️','Roadmap'],['match','🧩','Match'],['stats','📊','Progress'],['langSwitch','🌐','Language']];
+  return tabs.map(([id,ic,l])=>`<button class="${S.tab===id?'active':''}" data-tab="${id}"><span class="ic">${ic}</span>${l}</button>`).join('');
+}
+let matchState=null, stageCtx=null, stageTimer=null;
+
+function screen(){
+  if(S.tab==='profile') return profileScreen();
+  if(S.tab==='home') return stageCtx ? stageLessonScreen() : roadmapScreen();
+  if(S.tab==='match') return matchScreen();
+  if(S.tab==='stats') return statsScreen();
+  if(S.tab==='langSwitch') return langSelectView();
+  return '';
+}
+function profileScreen(){
+  const u=S.user||{};
+  return `<button class="backBtn" data-back-tab="home">← Back</button><div class="card"><h3>👤 Profile</h3>
+    <div class="kv"><b>Name</b><span>${u.name||'—'}</span></div>
+    <div class="kv"><b>Username</b><span>${u.username||'—'}</span></div>
+    <div class="kv"><b>Email</b><span>${u.email||'—'}</span></div>
+    <div class="kv"><b>Contact</b><span>${u.contact||'—'}</span></div>
+    <div class="kv"><b>Learning</b><span>${LANGS[S.lang].flag} ${LANGS[S.lang].name}</span></div>
+    <div class="kv" style="border-bottom:none;"><b>Level</b><span>${S.level}</span></div>
+  </div>`;
+}
+function roadmapScreen(){
+  const stages=levelModules(), done=langProgress(), cul=CULTURE[S.lang], n=stages.length;
+  const GAP=138, TOP=110, H=TOP+n*GAP+80;
+  const pts=[...stages.map((s,i)=>({x:50+27*Math.sin(i*1.35+0.4), y:TOP+i*GAP})), {x:50, y:TOP+n*GAP}];
+  const curve=(arr)=>arr.map((p,i)=>i===0?`M ${p.x.toFixed(1)} ${p.y}`:`C ${arr[i-1].x.toFixed(1)} ${arr[i-1].y+GAP*0.5} ${p.x.toFixed(1)} ${p.y-GAP*0.5} ${p.x.toFixed(1)} ${p.y}`).join(' ');
+  const doneArr=pts.slice(0,Math.min(done,n)+1);
+  const pct=Math.round(100*done/n);
+  return `<div class="heroBar"><div class="hIcons">${cul.icons.join(' ')}</div><div class="hFact">${cul.fact}</div></div>
+  <div class="lvlStrip"><b>${LANGS[S.lang].flag} ${LANGS[S.lang].name} · ${S.level||'Beginner'}</b><div class="xpbar"><i style="width:${pct}%"></i></div><span>${done}/${n} modules</span></div>
+  <div class="mapScene" style="height:${H}px;">
+    <svg class="mapPath" viewBox="0 0 100 ${H}" preserveAspectRatio="none" aria-hidden="true">
+      <path d="${curve(pts)}" class="pBase"/>
+      ${doneArr.length>1?`<path d="${curve(doneArr)}" class="pDone"/>`:''}
+    </svg>
+    ${stages.map((s,i)=>{
+      const state = i<done?'done':(i===done?'active':'locked'), p=pts[i];
+      return `<div class="mapNode ${state}" data-stage="${i}" style="left:${p.x.toFixed(1)}%;top:${p.y}px;">
+        ${state==='active'?`<div class="mapMascot">${mascotSVG(62)}<span class="startTag">START</span></div>`:''}
+        <div class="mapCirc">${state==='done'?'✓':s.icon}${state==='locked'?'<span class="lockBadge">🔒</span>':''}${state==='done'?'<span class="starBadge">⭐</span>':''}</div>
+        <div class="mapLabel"><b>${s.title}</b><span>${state==='done'?'Completed':state==='active'?'Tap to start':'Locked'}</span></div>
+      </div>`;
+    }).join('')}
+    <div class="mapNode goal ${done>=n?'done':'locked'}" style="left:50%;top:${pts[n].y}px;"><div class="mapCirc">🏆</div><div class="mapLabel"><b>${done>=n?'Level complete!':'Finish line'}</b><span>${done>=n?'Amazing work 🎉':'Clear every module'}</span></div></div>
+  </div>`;
+}
+function ringSVG(pct, size=120){
+  const r=48, c=2*Math.PI*r, off=c*(1-Math.max(0,Math.min(100,pct))/100);
+  return `<svg viewBox="0 0 120 120" width="${size}" height="${size}">
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--line)" stroke-width="11"/>
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--accent)" stroke-width="11" stroke-linecap="round"
+      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 60 60)"
+      style="transition:stroke-dashoffset 1s cubic-bezier(.34,1.2,.4,1);"/>
+    <text x="60" y="57" text-anchor="middle" font-size="22" font-weight="800" fill="var(--ink)" font-family="Baloo 2, sans-serif">${pct}%</text>
+    <text x="60" y="75" text-anchor="middle" font-size="10" fill="var(--sub)">score</text>
+  </svg>`;
+}
+function stageLessonScreen(){
+  const stages=levelModules();
+  const mod = stages[stageCtx.idx];
+  if(stageCtx.phase==='result') return renderStageResult(mod);
+  if(stageCtx.game==='chat') return stageCtx.phase==='cards' ? chatCardsScreen(mod) : chatQuizScreen(mod);
+  if(stageCtx.game==='builder') return builderScreen(mod);
+  if(stageCtx.game==='listen') return listenScreen(mod);
+  if(stageCtx.game==='speedmatch') return speedMatchScreen(mod);
+  return '';
+}
+
+function renderStageResult(mod){
+  const {resultCorrect:correct, resultTotal:total, resultPassed:passed, resultMsg, resultRows:rows}=stageCtx;
+  const msg = resultMsg || (passed ? pick(MASCOT_LINES.stageWin) : pick(MASCOT_LINES.stageTry));
+  const pct = total ? Math.round(100*correct/total) : 100;
+  const unit = stageCtx.game==='speedmatch' ? 'pairs matched' : 'correct';
+  return `<div class="card" style="text-align:center;">
+    <h3>${mod.title} · Recap</h3>
+    <div class="mascotResult">${mascotSVG(70)}</div>
+    <div class="ringWrap">${ringSVG(pct,140)}</div>
+    <p style="color:var(--sub);font-size:14px;margin-top:6px;">${correct}/${total} ${unit} — ${passed?'module passed, nice work!':'not quite a pass yet.'}</p>
+    <div class="bubble" style="display:inline-flex;max-width:340px;margin:10px auto 4px;text-align:left;">${msg}</div>
+    <div class="rowBtns"><button class="btn primary" id="finishResult" style="width:100%;">Continue to Roadmap</button></div>
+  </div>`;
+}
+
+function completeStage(passed, rows, correct, total){
+  if(passed){
+    const cur=langProgress(); const k=progKey();
+    if(stageCtx.idx===cur){ S.progress[k]=cur+1; store.set('progress',S.progress); }
+    addXP(15); touchToday();
+  } else { addXP(4); }
+  stageCtx.phase='result';
+  stageCtx.resultPassed=passed;
+  stageCtx.resultCorrect=correct;
+  stageCtx.resultTotal=total;
+  stageCtx.resultRows=rows||[];
+  stageCtx.resultMsg = passed?pick(MASCOT_LINES.stageWin):pick(MASCOT_LINES.stageTry);
+  const msgToSpeak = stageCtx.resultMsg;
+  render();
+  setTimeout(()=>speak(msgToSpeak, 'en'), 300);
+}
+
+/* ---- Chat Story ---- */
+function chatCardsScreen(mod){
+  const isFirst=stageCtx.pos===0, isLast=stageCtx.pos+1>=stageCtx.deck.length;
+  const shown=stageCtx.deck.slice(0,stageCtx.pos+1);
+  return `<div class="card">
+    <h3>${mod.title} · Message ${stageCtx.pos+1}/${stageCtx.deck.length}</h3>
+    <p style="color:var(--sub);font-size:12.5px;margin-top:-2px;">Your mascot is texting you in ${LANGS[S.lang].name} — tap a message to reveal what it means.</p>
+    <div class="chatThread" id="chatThread">
+      ${shown.map((p,i)=>{
+        const revealed=stageCtx.revealed.has(i);
+        return `<div class="chatMsg">
+          <div class="chatAvatar">${mascotSVG(30)}</div>
+          <div class="chatBubble ${revealed?'flipped':''}" data-msg="${i}">
+            <div class="chatFront"><div class="bubbleTop"><b>${p[1]}</b>${sayBtn(p[1],null,'onDark')}</div>${p[2]?`<span class="chatPron">${p[2]}</span>`:''}<span class="tapHint">Tap to translate 👆</span></div>
+            <div class="chatBack"><span class="chatBackLabel">means</span><b>"${p[0]}"</b><span style="display:block;margin-top:4px;">${sayBtn(p[1])} ${sayBtn(p[1],0.55)}</span><span class="tapHint">Tap to flip back</span></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="rowBtns">${isFirst?'':'<button class="btn ghost" id="cardPrev">← Previous</button>'}<button class="btn primary" id="cardNext">${isLast?'Start quiz':'Next'}</button></div>
+  </div>`;
+}
+function chatQuizScreen(mod){
+  const q = stageCtx.quiz[stageCtx.qpos];
+  const isFirstQ=stageCtx.qpos===0, isLastQ=stageCtx.qpos+1>=stageCtx.quiz.length;
+  return `<div class="card">
+    <div class="qHead"><h3>${mod.title} · Quiz ${stageCtx.qpos+1}/${stageCtx.quiz.length}</h3><span class="hdrAudio">${sayBtn(q.correct[1])}${sayBtn(q.correct[1],0.55)}</span></div>
+    <p style="font-weight:700;">How do you say "${q.correct[0]}" in ${LANGS[S.lang].name}?</p>
+    <div class="qOptions">${q.opts.map((o,i)=>`<div class="optRow"><button class="qOpt ${q.answered && o===q.correct?'correct':''} ${q.answered && o===q.chosen && o!==q.correct?'wrong':''}" data-opt="${i}" ${q.answered?'disabled':''}>${withPron(o[1],o[2])}</button>${sayBtn(o[1])}</div>`).join('')}</div>
+    <div class="rowBtns">${isFirstQ?'':'<button class="btn ghost" id="quizPrev">← Previous</button>'}<button class="btn primary" id="quizNext" ${q.answered?'':'disabled'}>${isLastQ?'Submit':'Next'}</button></div>
+  </div>`;
+}
+
+/* ---- Sentence Builder ---- */
+function setupBuilderPos(){
+  const it=stageCtx.items[stageCtx.pos];
+  const words=splitWords(it[1], S.lang);
+  const bank=words.map((w,i)=>({id:'w'+i+'_'+Math.random().toString(36).slice(2),text:w}));
+  bank.sort(()=>Math.random()-.5);
+  stageCtx.bank=bank; stageCtx.built=[]; stageCtx.checked=false; stageCtx.correctFlag=null;
+}
+function builderScreen(mod){
+  const it = stageCtx.items[stageCtx.pos];
+  const isLast = stageCtx.pos+1>=stageCtx.items.length;
+  return `<div class="card">
+    <div class="qHead"><h3>${mod.title} · Build ${stageCtx.pos+1}/${stageCtx.items.length}</h3><span class="hdrAudio">${sayBtn(it[1])}${sayBtn(it[1],0.55)}</span></div>
+    <p style="color:var(--sub);font-size:12.5px;margin-top:-2px;">Say it in ${LANGS[S.lang].name}: tap the pieces in order.</p>
+    <div class="lessonPanel" style="padding:16px 14px;margin-top:10px;"><div class="len" style="font-style:normal;font-size:16px;">"${it[0]}"</div>${it[2]?`<div class="lpron" style="margin-top:8px;">Pinyin: ${it[2]}</div>`:''}</div>
+    <div class="builtRow ${stageCtx.checked ? (stageCtx.correctFlag?'ok':'bad') : ''}">${stageCtx.built.length ? stageCtx.built.map(b=>`<button class="chip built" data-built="${b.id}" ${stageCtx.checked?'disabled':''}>${b.text}</button>`).join('') : '<span class="chipPlaceholder">Tap pieces below…</span>'}</div>
+    <div class="bankRow">${stageCtx.bank.map(b=>`<button class="chip bank" data-bank="${b.id}" ${stageCtx.checked?'disabled':''}>${b.text}</button>`).join('')}</div>
+    ${stageCtx.checked ? `<p style="font-size:13px;font-weight:700;margin-top:10px;color:${stageCtx.correctFlag?'#16a34a':'#c11c22'};">${stageCtx.correctFlag?'✅ Nice! That\u2019s right.':'❌ Correct answer: '+withPron(it[1],it[2])}</p>` : ''}
+    <div class="rowBtns">
+      ${stageCtx.checked ? `<button class="btn primary" id="builderNext" style="width:100%;">${isLast?'See results':'Next'}</button>`
+      : `<button class="btn ghost" id="builderClear">↺ Clear</button><button class="btn primary" id="builderCheck" ${stageCtx.built.length?'':'disabled'}>Check</button>`}
+    </div>
+  </div>`;
+}
+
+/* ---- Listening Challenge ---- */
+function listenScreen(mod){
+  const q=stageCtx.quiz[stageCtx.qpos];
+  const isLastQ=stageCtx.qpos+1>=stageCtx.quiz.length;
+  return `<div class="card">
+    <div class="qHead"><h3>${mod.title} · Listen ${stageCtx.qpos+1}/${stageCtx.quiz.length}</h3></div>
+    <p style="color:var(--sub);font-size:12.5px;margin-top:-4px;">Listen closely, then choose what it means.</p>
+    <div style="text-align:center;margin:16px 0;"><button class="listenPlayBtn" id="listenPlay">🔊 Play phrase</button> ${sayBtn(q.correct[1],0.55,'big')}</div>
+    <div class="qOptions">${q.opts.map((o,i)=>`<button class="qOpt ${q.answered && o===q.correct?'correct':''} ${q.answered && o===q.chosen && o!==q.correct?'wrong':''}" data-lopt="${i}" ${q.answered?'disabled':''}>${o[0]}</button>`).join('')}</div>
+    ${q.answered?`<p style="font-size:13px;color:var(--sub);margin-top:8px;">You heard: <b>${q.correct[1]}</b>${q.correct[2]?` <span style="font-style:italic;">(${q.correct[2]})</span>`:''}</p>`:''}
+    <div class="rowBtns"><button class="btn primary" id="listenNext" ${q.answered?'':'disabled'} style="width:100%;">${isLastQ?'See results':'Next'}</button></div>
+  </div>`;
+}
+
+/* ---- Speed Match ---- */
+function speedMatchScreen(mod){
+  const {tiles,picked,solved,timeLeft,total}=stageCtx;
+  return `<div class="card"><h3>${mod.title} · Speed Match</h3>
+    <p style="color:var(--sub);font-size:12.5px;margin-top:-4px;">Match every pair before the timer runs out!</p>
+    <div class="smHead"><span class="stat ${timeLeft<=10?'warn':''}">⏱ ${timeLeft}s</span><span class="stat">${solved.size}/${total} matched</span></div>
+    <div class="matchGrid">${tiles.map(t=>`<div class="matchTile ${solved.has(t.pair)?'done':''} ${picked.includes(t.id)?'picked':''}" data-smtile="${t.id}">${t.label}</div>`).join('')}</div>
+  </div>`;
+}
+function tickSpeedMatch(){
+  if(!stageCtx || stageCtx.game!=='speedmatch' || stageCtx.phase!=='play'){ if(stageTimer){clearInterval(stageTimer); stageTimer=null;} return; }
+  stageCtx.timeLeft--;
+  if(stageCtx.timeLeft<=0){ finishSpeedMatch(false); return; }
+  render();
+}
+function finishSpeedMatch(passed){
+  if(stageTimer){ clearInterval(stageTimer); stageTimer=null; }
+  const matched=stageCtx.solved.size, total=stageCtx.total;
+  completeStage(passed, [], matched, total);
+}
+
+function startStage(idx){
+  if(stageTimer){ clearInterval(stageTimer); stageTimer=null; }
+  const mod=levelModules()[idx]; const game=gameForModule(idx); const pool=allItems();
+  if(game==='chat'){
+    const deck=mod.items.map(itemTuple);
+    const quiz=mod.items.map(it=>{
+      const correct=itemTuple(it); let opts=[correct];
+      while(opts.length<4){const c=itemTuple(pick(pool)); if(!opts.some(o=>o[1]===c[1])) opts.push(c);}
+      opts.sort(()=>Math.random()-.5); return {correct,opts,answered:false,chosen:null};
+    });
+    stageCtx={idx,game,phase:'cards',deck,pos:0,quiz,qpos:0,correctCount:0,revealed:new Set()};
+  } else if(game==='builder'){
+    stageCtx={idx,game,phase:'play',items:mod.items.map(itemTuple),pos:0,correctCount:0,itemResults:[],bank:[],built:[],checked:false,correctFlag:null};
+    setupBuilderPos();
+  } else if(game==='listen'){
+    const quiz=mod.items.map(it=>{
+      const correct=itemTuple(it); let opts=[correct];
+      while(opts.length<4){const c=itemTuple(pick(pool)); if(!opts.some(o=>o[0]===c[0])) opts.push(c);}
+      opts.sort(()=>Math.random()-.5); return {correct,opts,answered:false,chosen:null,played:false};
+    });
+    stageCtx={idx,game,phase:'play',quiz,qpos:0,correctCount:0};
+  } else if(game==='speedmatch'){
+    const pairs=mod.items.map(itemTuple);
+    let tiles=[]; pairs.forEach((p,i)=>{ tiles.push({id:'a'+i,label:p[0],pair:i}); tiles.push({id:'b'+i,label:withPron(p[1],p[2])+sayBtn(p[1],null,'tileSpk'),pair:i}); });
+    tiles.sort(()=>Math.random()-.5);
+    stageCtx={idx,game,phase:'play',tiles,picked:[],solved:new Set(),total:pairs.length,timeLeft:Math.max(30,pairs.length*12)};
+    stageTimer=setInterval(tickSpeedMatch,1000);
+  }
+  render();
+}
+function statsScreen(){
+  const totalCorrect=S.history.reduce((a,d)=>a+(d.correct||0),0), totalAns=S.history.reduce((a,d)=>a+(d.total||0),0);
+  const acc=totalAns?Math.round(100*totalCorrect/totalAns):0;
+  return `<div class="card"><h3>Progress</h3>
+    <p style="color:var(--sub);font-size:14px;">Level ${Math.floor(S.xp/100)+1} · ${S.xp%100}/100 XP to next level</p>
+    <div class="xpbar"><i style="width:${S.xp%100}%"></i></div>
+    <p style="margin-top:14px;font-size:14px;">Overall accuracy: <b>${acc}%</b> across ${totalAns} answers</p>
+    <canvas id="xpChart" height="160"></canvas></div>
+  <div class="card"><h3>This week</h3><div class="cal">${weekCells()}</div></div>
+  <div class="card"><h3>🔔 Daily reminders</h3><p style="font-size:14px;color:var(--sub);">Get a friendly nudge if you haven't practiced today.</p><button class="btn secondary" id="notifBtn">Enable reminders</button></div>`;
+}
+function weekCells(){let out='';for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().slice(0,10);const on=S.history.some(h=>h.date===ds&&h.xp>0);out+=`<div class="${on?'on':''}" title="${ds}"></div>`;}return out;}
+function matchScreen(){
+  if(!matchState) newMatch();
+  const {tiles,picked,solved}=matchState;
+  return `<div class="card"><h3>Match the pairs</h3><p style="color:var(--sub);font-size:13px;">From your ${S.level||'Beginner'} modules — tap the English phrase, then its ${LANGS[S.lang].name} match.</p>
+    <div class="matchGrid">${tiles.map(t=>`<div class="matchTile ${solved.has(t.pair)?'done':''} ${picked.includes(t.id)?'picked':''}" data-tile="${t.id}">${t.label}</div>`).join('')}</div>
+    <button class="btn ghost" style="margin-top:12px;" id="resetMatch">🔄 New round</button></div>`;
+}
+function newMatch(){const pool=levelModules().flatMap(m=>m.items).map(itemTuple).slice(0,6);let tiles=[];pool.forEach((p,i)=>{tiles.push({id:'a'+i,label:p[0],pair:i});tiles.push({id:'b'+i,label:withPron(p[1],p[2])+sayBtn(p[1],null,'tileSpk'),pair:i});});tiles.sort(()=>Math.random()-.5);matchState={tiles,picked:[],solved:new Set()};}
+
+function bind(){
+  const avBtn=document.getElementById('avatarBtn');
+  if(avBtn) avBtn.onclick=()=>{ S.showMenu=!S.showMenu; render(); };
+  document.querySelectorAll('[data-menu]').forEach(el=>el.onclick=()=>{
+    const m=el.dataset.menu; S.showMenu=false;
+    if(m==='profile'){ S.tab='profile'; }
+    if(m==='dashboard'){ S.tab='stats'; }
+    if(m==='logout'){ S.user=null; S.screen='splash'; S.formErr=''; S.screenHistory=[]; S.homeAudioPlayed=false; }
+    render();
+  });
+  const bbt=document.querySelector('[data-back-tab]'); if(bbt) bbt.onclick=()=>{S.tab=bbt.dataset.backTab; render();};
+
+  document.querySelectorAll('[data-tab]').forEach(el=>el.onclick=()=>{
+    S.tab=el.dataset.tab; stageCtx=null; matchState=null; S.showMenu=false;
+    if(stageTimer){ clearInterval(stageTimer); stageTimer=null; }
+    render();
+  });
+  if(S.tab==='home' && !stageCtx){
+    document.querySelectorAll('[data-stage]').forEach(el=>el.onclick=()=>{
+      const i=+el.dataset.stage; if(i>langProgress()){ toast('Clear the previous module to unlock this one 🔒'); return; } startStage(i);
+    });
+  }
+  if(S.tab==='home' && stageCtx && stageCtx.phase==='result'){
+    const fr=document.getElementById('finishResult'); if(fr) fr.onclick=()=>{ stageCtx=null; render(); };
+  }
+  if(S.tab==='home' && stageCtx && stageCtx.game==='chat' && stageCtx.phase!=='result'){
+    if(stageCtx.phase==='cards'){
+      const th=document.getElementById('chatThread'); if(th) th.scrollTop=th.scrollHeight;
+      document.querySelectorAll('[data-msg]').forEach(el=>el.onclick=()=>{
+        const i=+el.dataset.msg;
+        if(stageCtx.revealed.has(i)){ stageCtx.revealed.delete(i); }
+        else { stageCtx.revealed.add(i); speak(stageCtx.deck[i][1], S.lang); }
+        render();
+      });
+      const cp=document.getElementById('cardPrev'); if(cp) cp.onclick=()=>{ if(stageCtx.pos>0){stageCtx.pos--; render();} };
+      const cn=document.getElementById('cardNext'); if(cn) cn.onclick=()=>{
+        if(stageCtx.pos+1<stageCtx.deck.length){stageCtx.pos++;} else {stageCtx.phase='quiz';}
+        render();
+      };
+    } else {
+      const q=stageCtx.quiz[stageCtx.qpos];
+      const qs=document.getElementById('qSpk'); if(qs) qs.onclick=()=>speak(q.correct[1], S.lang);
+      const qp=document.getElementById('quizPrev'); if(qp) qp.onclick=()=>{ if(stageCtx.qpos>0){stageCtx.qpos--; render();} };
+      document.querySelectorAll('[data-opt]').forEach(btn=>btn.onclick=()=>{
+        if(q.answered) return;
+        const chosen=q.opts[+btn.dataset.opt]; q.chosen=chosen; q.answered=true;
+        const ok=chosen===q.correct; if(ok) stageCtx.correctCount++;
+        logAnswer(q.correct[0], ok);
+        speak(q.correct[1], S.lang);
+        render();
+      });
+      const qn=document.getElementById('quizNext');
+      if(qn) qn.onclick=()=>{
+        if(stageCtx.qpos+1<stageCtx.quiz.length){ stageCtx.qpos++; render(); return; }
+        const passed = stageCtx.correctCount >= Math.ceil(stageCtx.quiz.length/2);
+        const rows = stageCtx.quiz.map(q2=>{
+          const ok=q2.chosen && q2.chosen[1]===q2.correct[1];
+          return {label:q2.correct[0], detail:`${LANGS[S.lang].name}: ${q2.correct[1]}${q2.correct[2]?' ('+q2.correct[2]+')':''}${!ok && q2.chosen?` — you picked "${q2.chosen[1]}"`:''}`, ok, say:q2.correct[1]};
+        });
+        completeStage(passed, rows, stageCtx.correctCount, stageCtx.quiz.length);
+      };
+    }
+  }
+  if(S.tab==='home' && stageCtx && stageCtx.game==='builder' && stageCtx.phase==='play'){
+    if(!stageCtx.checked){
+      document.querySelectorAll('[data-bank]').forEach(el=>el.onclick=()=>{
+        const id=el.dataset.bank; const i=stageCtx.bank.findIndex(b=>b.id===id); if(i<0) return;
+        const [chip]=stageCtx.bank.splice(i,1); stageCtx.built.push(chip); render();
+      });
+      document.querySelectorAll('[data-built]').forEach(el=>el.onclick=()=>{
+        const id=el.dataset.built; const i=stageCtx.built.findIndex(b=>b.id===id); if(i<0) return;
+        const [chip]=stageCtx.built.splice(i,1); stageCtx.bank.push(chip); render();
+      });
+      const bc=document.getElementById('builderClear'); if(bc) bc.onclick=()=>{ stageCtx.bank.push(...stageCtx.built); stageCtx.built=[]; render(); };
+      const bch=document.getElementById('builderCheck'); if(bch) bch.onclick=()=>{
+        const it=stageCtx.items[stageCtx.pos];
+        const key=joinWords(splitWords(it[1],S.lang),S.lang).toLowerCase();
+        const attempt=joinWords(stageCtx.built.map(b=>b.text),S.lang).toLowerCase();
+        const ok = attempt===key;
+        stageCtx.checked=true; stageCtx.correctFlag=ok; if(ok) stageCtx.correctCount++;
+        stageCtx.itemResults.push({label:it[0], detail:`${LANGS[S.lang].name}: ${it[1]}${it[2]?' ('+it[2]+')':''}`, ok, say:it[1]});
+        logAnswer(it[0], ok);
+        speak(it[1], S.lang);
+        render();
+      };
+    } else {
+      const bn=document.getElementById('builderNext'); if(bn) bn.onclick=()=>{
+        if(stageCtx.pos+1<stageCtx.items.length){ stageCtx.pos++; setupBuilderPos(); render(); }
+        else {
+          const passed = stageCtx.correctCount>=Math.ceil(stageCtx.items.length/2);
+          completeStage(passed, stageCtx.itemResults, stageCtx.correctCount, stageCtx.items.length);
+        }
+      };
+    }
+  }
+  if(S.tab==='home' && stageCtx && stageCtx.game==='listen' && stageCtx.phase==='play'){
+    const q=stageCtx.quiz[stageCtx.qpos];
+    if(!q.played){ q.played=true; setTimeout(()=>speak(q.correct[1], S.lang), 300); }
+    const lp=document.getElementById('listenPlay'); if(lp) lp.onclick=()=>speak(q.correct[1], S.lang);
+    document.querySelectorAll('[data-lopt]').forEach(btn=>btn.onclick=()=>{
+      if(q.answered) return;
+      const chosen=q.opts[+btn.dataset.lopt]; q.chosen=chosen; q.answered=true;
+      const ok=chosen[0]===q.correct[0]; if(ok) stageCtx.correctCount++;
+      logAnswer(q.correct[0], ok);
+      render();
+    });
+    const ln=document.getElementById('listenNext'); if(ln) ln.onclick=()=>{
+      if(stageCtx.qpos+1<stageCtx.quiz.length){ stageCtx.qpos++; render(); return; }
+      const passed=stageCtx.correctCount>=Math.ceil(stageCtx.quiz.length/2);
+      const rows=stageCtx.quiz.map(q2=>{
+        const ok = q2.chosen && q2.chosen[0]===q2.correct[0];
+        return {label:withPron(q2.correct[1],q2.correct[2]), detail:`means "${q2.correct[0]}"${!ok && q2.chosen?` — you picked "${q2.chosen[0]}"`:''}`, ok, say:q2.correct[1]};
+      });
+      completeStage(passed, rows, stageCtx.correctCount, stageCtx.quiz.length);
+    };
+  }
+  if(S.tab==='home' && stageCtx && stageCtx.game==='speedmatch' && stageCtx.phase==='play'){
+    document.querySelectorAll('[data-smtile]').forEach(el=>el.onclick=()=>{
+      const id=el.dataset.smtile; if(stageCtx.picked.includes(id)) return;
+      const tile=stageCtx.tiles.find(t=>t.id===id); if(!tile || stageCtx.solved.has(tile.pair)) return;
+      stageCtx.picked.push(id);
+      if(stageCtx.picked.length===2){
+        const [id1,id2]=stageCtx.picked, t1=stageCtx.tiles.find(t=>t.id===id1), t2=stageCtx.tiles.find(t=>t.id===id2);
+        if(t1.pair===t2.pair){
+          stageCtx.solved.add(t1.pair); stageCtx.picked=[];
+          if(stageCtx.solved.size===stageCtx.total){ finishSpeedMatch(true); return; }
+        } else { setTimeout(()=>{ if(stageCtx && stageCtx.game==='speedmatch'){stageCtx.picked=[]; render();} },500); }
+      }
+      render();
+    });
+  }
+  if(S.tab==='match'){
+    document.querySelectorAll('[data-tile]').forEach(el=>el.onclick=()=>{
+      const id=el.dataset.tile; if(matchState.picked.includes(id)) return;
+      matchState.picked.push(id);
+      if(matchState.picked.length===2){
+        const [id1,id2]=matchState.picked, t1=matchState.tiles.find(t=>t.id===id1), t2=matchState.tiles.find(t=>t.id===id2);
+        if(t1.pair===t2.pair){ matchState.solved.add(t1.pair); matchState.picked=[]; addXP(6); touchToday();
+          if(matchState.solved.size===matchState.tiles.length/2){ toast('Board cleared! +bonus XP'); addXP(10); } }
+        else { setTimeout(()=>{matchState.picked=[]; render();},550); }
+      }
+      render();
+    });
+    const rb=document.getElementById('resetMatch'); if(rb) rb.onclick=()=>{newMatch(); render();};
+  }
+  if(S.tab==='stats'){
+    const ctx=document.getElementById('xpChart');
+    if(ctx && window.Chart){
+      const last=S.history.slice(-7);
+      new Chart(ctx,{type:'line',data:{labels:last.map(d=>d.date.slice(5)),datasets:[{label:'XP',data:last.map(d=>d.xp),borderColor:getComputedStyle(document.documentElement).getPropertyValue('--accent'),tension:.3,fill:false}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+    }
+    const nb=document.getElementById('notifBtn');
+    if(nb) nb.onclick=async()=>{
+      if(!('Notification' in window)){toast('Notifications not supported in this browser.'); return;}
+      const perm=await Notification.requestPermission();
+      if(perm==='granted'){ toast('Reminders on! (demo notification below)'); setTimeout(()=>{try{new Notification('FluentFlow 🦉',{body:pick(MASCOT_LINES.idle)});}catch(e){}},1500); }
+      else toast('Notifications blocked — enable them in browser settings.');
+    };
+  }
+  if(S.tab==='langSwitch'){
+    document.querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>{S.lang=el.dataset.pick; render();});
+    const btn=document.getElementById('langNext');
+    if(btn) btn.onclick=()=>{ store.set('lang',S.lang); S.tab='home'; render(); };
+  }
+}
+
+render();
+</script>
+</body>
+</html>
